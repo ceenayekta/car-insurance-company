@@ -1,4 +1,3 @@
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -474,7 +473,6 @@ public class InsuranceCompany implements Cloneable, Serializable {
       errorMessage = "Error in create/open the file!";
       ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
       errorMessage = "Error in reading company from file!";
-      System.out.println("HERE");
       InsuranceCompany company = (InsuranceCompany) inputStream.readObject();
       initialize(company);
       errorMessage = "Error in closing the file!";
@@ -483,7 +481,6 @@ public class InsuranceCompany implements Cloneable, Serializable {
       return true;
     } catch(IOException ex) {
       System.err.println(errorMessage);
-      System.out.println(ex);
     } catch (ClassNotFoundException ex)  {
       System.err.println("Error in wrong class in the file.");
     }
