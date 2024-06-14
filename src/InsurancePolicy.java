@@ -1,4 +1,10 @@
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -240,6 +246,54 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
   @Override
   public int compareTo(InsurancePolicy ip) {
     return expiryDate.compareTo(ip.expiryDate);
+  }
+
+  //lab6
+  public static boolean save(HashMap<Integer, InsurancePolicy> policies, String fileName) {
+    String errorMessage = "";
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectOutputStream outputStream = new ObjectOutputStream(Files.newOutputStream(Paths.get(fileName)));
+      errorMessage = "Error in adding policies to the file!";
+      for (InsurancePolicy policy : policies.values()) {
+        outputStream.writeObject(policy);
+      }
+      errorMessage = "Error in closing the file!";
+      if (outputStream != null) outputStream.close();
+      errorMessage = "";
+      return true;
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+    }
+    return false;
+  }
+  
+  public static HashMap<Integer, InsurancePolicy> load(String fileName) {
+    String errorMessage = "";
+    HashMap<Integer, InsurancePolicy> policies = new HashMap<Integer, InsurancePolicy>();
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
+      errorMessage = "Error in reading policies from file!";
+
+      try {
+        while(true) {
+          InsurancePolicy policy = (InsurancePolicy) inputStream.readObject();
+          policies.put(policy.id, policy);
+        }
+      } catch(EOFException ex) {
+        System.out.println("End of " + fileName + ".");
+      }
+
+      errorMessage = "Error in closing the file!";
+      if (inputStream != null) inputStream.close();
+      errorMessage = "";
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+    } catch (ClassNotFoundException ex)  {
+      System.err.println("Error in wrong class in the file.");
+    }
+    return policies;
   }
 }
 

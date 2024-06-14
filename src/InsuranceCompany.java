@@ -1,4 +1,10 @@
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +27,14 @@ public class InsuranceCompany implements Cloneable, Serializable {
   }
 
   public InsuranceCompany(InsuranceCompany company) {
+    initialize(company);
+  }
+
+  //lab6
+  public InsuranceCompany() {}
+
+  public void initialize(InsuranceCompany company) {
+    System.out.println("HERE");
     this.name = company.name;
     this.adminUsername = company.adminUsername;
     this.adminPassword = company.adminPassword;
@@ -30,6 +44,7 @@ public class InsuranceCompany implements Cloneable, Serializable {
     //   users.add(new User(user));
     // }
     this.users = new HashMap<>();
+    User.printUsers(company.users);
     for (User user : company.users.values()) {
       users.put(user.getUserID(), new User(user));
     }
@@ -433,5 +448,45 @@ public class InsuranceCompany implements Cloneable, Serializable {
     ArrayList<User> shallowCopyUsers = User.shallowCopy(users);
     Collections.sort(shallowCopyUsers);
     return shallowCopyUsers;
+  }
+
+  //lab6
+  public boolean save(String fileName) {
+    String errorMessage = "";
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectOutputStream outputStream = new ObjectOutputStream(Files.newOutputStream(Paths.get(fileName)));
+      errorMessage = "Error in adding the company to the file!";
+      outputStream.writeObject(this);
+      errorMessage = "Error in closing the file!";
+      if (outputStream != null) outputStream.close();
+      errorMessage = "";
+      return true;
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+    }
+    return false;
+  }
+  
+  public boolean load(String fileName) {
+    String errorMessage = "";
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
+      errorMessage = "Error in reading company from file!";
+      System.out.println("HERE");
+      InsuranceCompany company = (InsuranceCompany) inputStream.readObject();
+      initialize(company);
+      errorMessage = "Error in closing the file!";
+      if (inputStream != null) inputStream.close();
+      errorMessage = "";
+      return true;
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+      System.out.println(ex);
+    } catch (ClassNotFoundException ex)  {
+      System.err.println("Error in wrong class in the file.");
+    }
+    return false;
   }
 }

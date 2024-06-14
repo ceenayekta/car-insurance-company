@@ -1,10 +1,10 @@
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class UserInterface
-{
+public class UserInterface {
   int activeMenu = 0;
   final String RED = "\u001B[31m";
   final String GREEN = "\u001B[32m";
@@ -144,6 +144,7 @@ public class UserInterface
       }
       // sort
       testUser.sortPoliciesByDate();
+      printDivider();
       System.out.println("After Sorting Policies");
       System.out.println("Original Policies:");
       InsurancePolicy.printPolicies(testUser.getPolicies());
@@ -164,6 +165,7 @@ public class UserInterface
       }
       // sort
       mainCompany.sortUsers();
+      printDivider();
       System.out.println("After Sorting Users");
       System.out.println("Original Users:");
       User.printUsers(mainCompany.getUsers());
@@ -172,6 +174,7 @@ public class UserInterface
       System.out.println("Deep Copied Users:");
       User.printUsers(deepCopyUsers);
       // deep copy company
+      printDivider();
       InsuranceCompany deepCopyCompany = mainCompany.clone();
       String storeName = mainCompany.getName();
       mainCompany.setName("Testing Deep Copy");
@@ -185,12 +188,50 @@ public class UserInterface
         passedCount++;
       }
       mainCompany.setName(storeName);
+
+      // lab6
+      printDivider();
+      String fileNamePolicies = "policies.ser";
+      System.out.println("List of Policies:");
+      InsurancePolicy.printPolicies(testUser.getPolicies());
+      System.out.println("Saving Policies...");
+      InsurancePolicy.save(testUser.getPolicies(), fileNamePolicies);
+      System.out.println("List of Saved Policies:");
+      HashMap<Integer, InsurancePolicy> savedPolicies = InsurancePolicy.load(fileNamePolicies);
+      InsurancePolicy.printPolicies(savedPolicies);
+      if (savedPolicies.size() > 0) passedCount++;
+      else failedCount++;
+      printDivider();
+      String fileNameUsers = "users.ser";
+      System.out.println("List of Users:");
+      User.printUsers(mainCompany.getUsers());
+      System.out.println("Saving Users...");
+      User.save(mainCompany.getUsers(), fileNameUsers);
+      System.out.println("List of Saved Policies:");
+      HashMap<Integer, User> savedUsers = User.load(fileNameUsers);
+      User.printUsers(savedUsers);
+      if (savedUsers.size() > 0) passedCount++;
+      else failedCount++;
+      printDivider();
+      String fileNameCompany = "company.ser";
+      System.out.println("Deep Copy of Company:");
+      deepCopyCompany.print();
+      System.out.println("Saving Deep Copy of Company...");
+      deepCopyCompany.save(fileNameCompany);
+      System.out.println("Clone and Re-initialized Company:");
+      InsuranceCompany cloneCompany = new InsuranceCompany();
+      cloneCompany.load(fileNameCompany);
+      cloneCompany.print();
+      if (mainCompany.getName().equals(cloneCompany.getName())) passedCount++;
+      else failedCount++;
+
     } catch (CloneNotSupportedException e) {
       System.out.println("Cloning not supported! Initial tests Skipped.");
     } catch (PolicyException e) {
       System.out.println("A policy id is out of range! Initial tests Skipped.");
     }
 
+    //lab5
     try {
       System.out.println("Testing out of range policy id");
       new ComprehensivePolicy(1, null, 0, "", null, 0, 0);
@@ -585,5 +626,9 @@ public class UserInterface
     int price = getRestrictedInt(0, null, "Enter car price ");
     Car car = new Car(carModel, carType, year, price);
     return car;
+  }
+
+  public void printDivider() {
+    System.out.println("__________________________________________________");
   }
 }

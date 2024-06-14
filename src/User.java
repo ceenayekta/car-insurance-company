@@ -1,4 +1,10 @@
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -338,5 +344,53 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     ArrayList<InsurancePolicy> shallowCopyPolicies = InsurancePolicy.shallowCopy(policies);
     Collections.sort(shallowCopyPolicies);
     return shallowCopyPolicies;
+  }
+
+  //lab6
+  public static boolean save(HashMap<Integer, User> users, String fileName) {
+    String errorMessage = "";
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectOutputStream outputStream = new ObjectOutputStream(Files.newOutputStream(Paths.get(fileName)));
+      errorMessage = "Error in adding users to the file!";
+      for (User user : users.values()) {
+        outputStream.writeObject(user);
+      }
+      errorMessage = "Error in closing the file!";
+      if (outputStream !=null) outputStream.close();
+      errorMessage = "";
+      return true;
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+    }
+    return false;
+  }
+  
+  public static HashMap<Integer, User> load(String fileName) {
+    String errorMessage = "";
+    HashMap<Integer, User> users = new HashMap<Integer, User>();
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
+      errorMessage = "Error in reading users from file!";
+
+      try {
+        while(true) {
+          User user = (User) inputStream.readObject();
+          users.put(user.userID, user);
+        }
+      } catch(EOFException ex) {
+        System.out.println("End of " + fileName + ".");
+      }
+
+      errorMessage = "Error in closing the file!";
+      if (inputStream != null) inputStream.close();
+      errorMessage = "";
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+    } catch (ClassNotFoundException ex)  {
+      System.err.println("Error in wrong class in the file.");
+    }
+    return users;
   }
 }
