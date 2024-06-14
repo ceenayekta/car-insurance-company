@@ -5,6 +5,7 @@ public class Car implements Cloneable, Serializable {
   private CarType type;
   private int manufacturingYear;
   private double price;
+  public final static String delimitedKey = "C";
 
   public Car(String model, CarType type, int manufacturingYear, double price) {
     this.model = model;
@@ -68,5 +69,10 @@ public class Car implements Cloneable, Serializable {
   @Override
   public Car clone() throws CloneNotSupportedException {
     return (Car) super.clone();
+  }
+
+  //lab6
+  public String toDelimitedString() {
+    return delimitedKey + "," + model + "," + type + "," + manufacturingYear + "," + price;
   }
 }

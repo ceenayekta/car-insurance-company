@@ -4,7 +4,8 @@ class MyDate implements Cloneable, Comparable<MyDate>, Serializable {
   private int year;
   private int month;
   private int day;
-    
+  public final static String delimitedKey = "MD";
+
   public MyDate(int year, int month, int day) {
     this.year = year;
     this.month = month;
@@ -83,5 +84,10 @@ class MyDate implements Cloneable, Comparable<MyDate>, Serializable {
     if (year == d.year && month == d.month && day > d.day) return 1;
     if (year == d.year && month == d.month && day == d.day) return 0;
     return -1;
+  }
+
+  //lab6
+  public String toDelimitedString() {
+    return delimitedKey + "," + year + "," + month + "," + day;
   }
 }

@@ -1,5 +1,6 @@
 public class ThirdPartyPolicy extends InsurancePolicy {
   private String comments;
+  public final static String delimitedKey = "TPP";
 
   public ThirdPartyPolicy(int id, Car car, int numberOfClaims, String policyHolderName, MyDate expiryDate, String comments) throws PolicyException {
     super(id, car, numberOfClaims, policyHolderName, expiryDate);
@@ -31,5 +32,10 @@ public class ThirdPartyPolicy extends InsurancePolicy {
   @Override
   public double calcPayment(double flatRate) {
     return this.getCar().getPrice() / 100 + this.getNumberOfClaims() * 200 + flatRate;
+  }
+
+  //lab6
+  public String toDelimitedString() {
+    return delimitedKey + "," + super.toDelimitedString() + "," + comments;
   }
 }
