@@ -88,7 +88,11 @@ public class UserInterface {
       "12. Remove a Policy",
       "13. Remove a User",
       "14. Change Password",
-      "15. Logout"
+      "15. Save Company in TextFile",
+      "16. Load Company from TextFile",
+      "17. Save Company in Binary",
+      "18. Load Company from Binary",
+      "19. Logout"
     );
     List<Runnable> actions = Arrays.asList(
       () -> testCode(),
@@ -105,6 +109,10 @@ public class UserInterface {
       () -> removePolicy(null),
       () -> removeUser(),
       () -> changePassword(),
+      () -> saveCompany("company.txt"),
+      () -> loadCompany("company.txt"),
+      () -> serializeCompany("company.ser"),
+      () -> loadSerializedCompany("company.ser"),
       () -> { activeMenu = 1; }
     );
     while(activeMenu > 1) {
@@ -286,9 +294,9 @@ public class UserInterface {
       printDivider();
       String fileNameCompany = "company.txt";
       System.out.println("Deep Copy of Company:");
-      deepCopyCompany.print();
+      mainCompany.print();
       System.out.println("Saving Deep Copy of Company...");
-      deepCopyCompany.saveTextFile(fileNameCompany);
+      mainCompany.saveTextFile(fileNameCompany);
       System.out.println("Clone and Re-initialized Company:");
       InsuranceCompany clonedCompany2 = new InsuranceCompany();
       clonedCompany2.loadTextFile(fileNameCompany);
@@ -483,6 +491,50 @@ public class UserInterface {
     } else {
       System.out.println("Confirm password did not match.");
     }
+  }
+
+  public void saveCompany(String fileName) {
+    System.out.println("Saving Company...");
+    if (mainCompany.saveTextFile(fileName)) {
+      System.out.println("Successfully Saved!");
+    } else {
+      System.out.println("Failed Saving!");
+    }
+    System.out.println();
+  }
+
+  public void loadCompany(String fileName) {
+    System.out.println("Loading Company...");
+    if (mainCompany.loadTextFile(fileName)) {
+      System.out.println("Successfully Loaded!");
+    } else {
+      System.out.println("Failed Loading!");
+    }
+    System.out.println();
+  }
+
+  public void serializeCompany(String fileName) {
+    System.out.println("Saving Company...");
+    try {
+      if (mainCompany.clone().save(fileName)) {
+        System.out.println("Successfully Saved!");
+      } else {
+        System.out.println("Failed Saving!");
+      }
+      System.out.println();
+    } catch (CloneNotSupportedException e) {
+      System.out.println("Not Supported!");
+    }
+  }
+
+  public void loadSerializedCompany(String fileName) {
+    System.out.println("Loading Company...");
+    if (mainCompany.load(fileName)) {
+      System.out.println("Successfully Loaded!");
+    } else {
+      System.out.println("Failed Loading!");
+    }
+    System.out.println();
   }
 
   public void totalPaymentPerCarModelAggregation(User user) {

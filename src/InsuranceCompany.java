@@ -38,7 +38,6 @@ public class InsuranceCompany implements Cloneable, Serializable {
   public InsuranceCompany() {}
 
   public void initialize(InsuranceCompany company) {
-    System.out.println("HERE");
     this.name = company.name;
     this.adminUsername = company.adminUsername;
     this.adminPassword = company.adminPassword;
@@ -48,7 +47,6 @@ public class InsuranceCompany implements Cloneable, Serializable {
     //   users.add(new User(user));
     // }
     this.users = new HashMap<>();
-    User.printUsers(company.users);
     for (User user : company.users.values()) {
       users.put(user.getUserID(), new User(user));
     }
