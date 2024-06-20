@@ -137,8 +137,8 @@ public class UserInterface {
       }}, null);
       mainCompany.addUser(testUser);
       // testing policies sort
-      HashMap<Integer, InsurancePolicy> shallowCopyPolicies = User.shallowCopyPoliciesHashMap(testUser.getPolicies());
-      HashMap<Integer, InsurancePolicy> deepCopyPolicies = User.deepCopyPoliciesHashMap(testUser.getPolicies());
+      HashMap<Integer, InsurancePolicy> shallowCopyPolicies = testUser.shallowCopyPoliciesHashMap();
+      HashMap<Integer, InsurancePolicy> deepCopyPolicies = testUser.deepCopyPoliciesHashMap();
       // change some fields in user
       testUser.setCity("New York");
       Car testCar3 = new Car("Test Car 3", CarType.HATCH, 1000, 1500);
@@ -162,8 +162,8 @@ public class UserInterface {
       System.out.println("Deep Copied Policies:");
       InsurancePolicy.printPolicies(deepCopyPolicies);
       // testing users sort
-      HashMap<Integer, User> shallowCopyUsers = InsuranceCompany.shallowCopyUsersHashMap(mainCompany.getUsers());
-      HashMap<Integer, User> deepCopyUsers = InsuranceCompany.deepCopyUsersHashMap(mainCompany.getUsers());
+      HashMap<Integer, User> shallowCopyUsers = mainCompany.shallowCopyUsersHashMap();
+      HashMap<Integer, User> deepCopyUsers = mainCompany.deepCopyUsersHashMap();
       // add new user
       User testUser2 = new User("Test Only 2", new Address(0, "Test 2", "t-test", "Testing"), null, null);
       mainCompany.addUser(testUser2);

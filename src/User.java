@@ -273,13 +273,13 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return output;
   }
   
-  // public static ArrayList<User> shallowCopy(ArrayList<User> users) {
-  //   ArrayList<User> shallowCopy = new ArrayList<User>();
-  //   for (User user : users) {
-  //     shallowCopy.add(user);
-  //   }
-  //   return shallowCopy;
-  // }
+  public static ArrayList<User> shallowCopy(ArrayList<User> users) {
+    ArrayList<User> shallowCopy = new ArrayList<User>();
+    for (User user : users) {
+      shallowCopy.add(user);
+    }
+    return shallowCopy;
+  }
   
   public static ArrayList<User> shallowCopy(HashMap<Integer, User> users) {
     ArrayList<User> shallowCopy = new ArrayList<User>();
@@ -297,13 +297,13 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return shallowCopy;
   }
 
-	// public static ArrayList<User> deepCopy(ArrayList<User> users) throws CloneNotSupportedException {
-  //   ArrayList<User> deepCopy = new ArrayList<User>();
-  //   for (User user : users) {
-  //     deepCopy.add(user.clone());
-  //   }
-  //   return deepCopy;
-  // }
+	public static ArrayList<User> deepCopy(ArrayList<User> users) throws CloneNotSupportedException {
+    ArrayList<User> deepCopy = new ArrayList<User>();
+    for (User user : users) {
+      deepCopy.add(user.clone());
+    }
+    return deepCopy;
+  }
 
 	public static ArrayList<User> deepCopy(HashMap<Integer, User> users) throws CloneNotSupportedException {
     ArrayList<User> deepCopy = new ArrayList<User>();
@@ -321,19 +321,19 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return deepCopy;
   }
   
-  public static ArrayList<InsurancePolicy> shallowCopyPolicies(HashMap<Integer, InsurancePolicy> policies) {
+  public ArrayList<InsurancePolicy> shallowCopyPolicies() {
     return InsurancePolicy.shallowCopy(policies);
   }
   
-  public static HashMap<Integer, InsurancePolicy> shallowCopyPoliciesHashMap(HashMap<Integer, InsurancePolicy> policies) {
+  public HashMap<Integer, InsurancePolicy> shallowCopyPoliciesHashMap() {
     return InsurancePolicy.shallowCopyHashMap(policies);
   }
 
-	public static ArrayList<InsurancePolicy> deepCopyPolicies(HashMap<Integer, InsurancePolicy> policies) throws CloneNotSupportedException {
+	public ArrayList<InsurancePolicy> deepCopyPolicies() throws CloneNotSupportedException {
     return InsurancePolicy.deepCopy(policies);
   }
 
-	public static HashMap<Integer, InsurancePolicy> deepCopyPoliciesHashMap(HashMap<Integer, InsurancePolicy> policies) throws CloneNotSupportedException {
+	public HashMap<Integer, InsurancePolicy> deepCopyPoliciesHashMap() throws CloneNotSupportedException {
     return InsurancePolicy.deepCopyHashMap(policies);
   }
   

@@ -34,6 +34,12 @@ public class ThirdPartyPolicy extends InsurancePolicy {
     return this.getCar().getPrice() / 100 + this.getNumberOfClaims() * 200 + flatRate;
   }
 
+  //lab4
+  @Override
+  public ThirdPartyPolicy clone() throws CloneNotSupportedException {
+    return (ThirdPartyPolicy) super.clone();
+  }
+
   //lab6
   public String toDelimitedString() {
     return delimitedKey + "," + super.toDelimitedString() + "," + comments;

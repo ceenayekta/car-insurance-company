@@ -420,11 +420,11 @@ public class InsuranceCompany implements Cloneable, Serializable {
   //   return User.shallowCopy(users);
   // }
   
-  public static ArrayList<User> shallowCopyUsers(HashMap<Integer, User> users) {
+  public ArrayList<User> shallowCopyUsers() {
     return User.shallowCopy(users);
   }
   
-  public static HashMap<Integer, User> shallowCopyUsersHashMap(HashMap<Integer, User> users) {
+  public HashMap<Integer, User> shallowCopyUsersHashMap() {
     return User.shallowCopyHashMap(users);
   }
 
@@ -432,11 +432,11 @@ public class InsuranceCompany implements Cloneable, Serializable {
   //   return User.deepCopy(users);
   // }
 
-	public static ArrayList<User> deepCopyUsers(HashMap<Integer, User> users) throws CloneNotSupportedException {
+	public ArrayList<User> deepCopyUsers() throws CloneNotSupportedException {
     return User.deepCopy(users);
   }
 
-	public static HashMap<Integer, User> deepCopyUsersHashMap(HashMap<Integer, User> users) throws CloneNotSupportedException {
+	public HashMap<Integer, User> deepCopyUsersHashMap() throws CloneNotSupportedException {
     return User.deepCopyHashMap(users);
   }
 
