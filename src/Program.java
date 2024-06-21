@@ -191,7 +191,9 @@ public class Program {
       user3.addPolicy(thirdPolicy3);
     } catch (PolicyException e) {
       System.out.println(e);
-    }
+    } catch (PolicyHolderNameException e) {
+      System.out.println(e);
+    } 
 
     insuranceCompany.addUser(user1);
     insuranceCompany.addUser(user2);

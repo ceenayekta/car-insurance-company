@@ -112,6 +112,12 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     System.out.println(", ");
   }
   
+  public static void printUsers(ArrayList<User> users) {
+    for (User user : users) {
+      System.out.println(user);
+    }
+  }
+  
   public static void printUsers(HashMap<Integer, User> users) {
     for (User user : users.values()) {
       System.out.println(user);
@@ -162,13 +168,13 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   }
 
   //lab3
-  public boolean createThirdPartyPolicy(String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, String comments) throws PolicyException {
+  public boolean createThirdPartyPolicy(String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, String comments) throws PolicyException, PolicyHolderNameException {
     if (findPolicy(id) != null) return false;
     ThirdPartyPolicy thirdPartyPolicy = new ThirdPartyPolicy(id, car, numberOfClaims, policyHolderName, expiryDate, comments);
     return addPolicy(thirdPartyPolicy);
   }
 
-  public boolean createComprehensivePolicy(String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, int driverAge, int level) throws PolicyException {
+  public boolean createComprehensivePolicy(String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, int driverAge, int level) throws PolicyException, PolicyHolderNameException {
     if (findPolicy(id) != null) return false;
     ComprehensivePolicy comprehensivePolicy = new ComprehensivePolicy(id, car, numberOfClaims, policyHolderName, expiryDate, driverAge, level);
     return addPolicy(comprehensivePolicy);
@@ -342,9 +348,9 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return address.compareTo(u.address);
   }
 
-  public int compareTo1(User u) {
-    return Double.compare(calcTotalPayments(5), u.calcTotalPayments(5));
-  }
+  // public int compareTo1(User u) {
+  //   return Double.compare(calcTotalPayments(5), u.calcTotalPayments(5));
+  // }
 
   public ArrayList<InsurancePolicy> sortPoliciesByDate() throws CloneNotSupportedException {
     ArrayList<InsurancePolicy> shallowCopyPolicies = InsurancePolicy.shallowCopy(policies);
@@ -440,11 +446,13 @@ public class User implements Cloneable, Comparable<User>, Serializable {
       System.out.println(e);
     } catch (PolicyException e) {
       System.out.println(e);
+    } catch (PolicyHolderNameException e) {
+      System.out.println(e);
     }
     return users;
   }
 
-  public static HashMap<Integer, User> extractPoliciesFromFields(int numberOfUsers, int startIndex, String[] fields) throws PolicyException {
+  public static HashMap<Integer, User> extractPoliciesFromFields(int numberOfUsers, int startIndex, String[] fields) throws PolicyException, PolicyHolderNameException {
     HashMap<Integer, User> users = new HashMap<>();
     for(int i = 0; i < numberOfUsers; i++) {
       // String delimitedKey = fields[startIndex + 0];

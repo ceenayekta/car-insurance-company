@@ -2,7 +2,7 @@ public class ThirdPartyPolicy extends InsurancePolicy {
   private String comments;
   public final static String delimitedKey = "TPP";
 
-  public ThirdPartyPolicy(int id, Car car, int numberOfClaims, String policyHolderName, MyDate expiryDate, String comments) throws PolicyException {
+  public ThirdPartyPolicy(int id, Car car, int numberOfClaims, String policyHolderName, MyDate expiryDate, String comments) throws PolicyException, PolicyHolderNameException {
     super(id, car, numberOfClaims, policyHolderName, expiryDate);
     this.comments = comments;
   }

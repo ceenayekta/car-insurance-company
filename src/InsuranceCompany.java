@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 //lab3
@@ -138,13 +139,13 @@ public class InsuranceCompany implements Cloneable, Serializable {
     return string + "}";
   }
 
-  public boolean createThirdPartyPolicy(int userID, String policyHolderName, int policyId, Car car, int numberOfClaims, MyDate expiryDate, String comments) throws PolicyException {
+  public boolean createThirdPartyPolicy(int userID, String policyHolderName, int policyId, Car car, int numberOfClaims, MyDate expiryDate, String comments) throws PolicyException, PolicyHolderNameException {
     User user = findUser(userID);
     if (user == null) return false;
     return user.createThirdPartyPolicy(policyHolderName, policyId, car, numberOfClaims, expiryDate, comments);
   }
 
-  public boolean createComprehensivePolicy(int userID, String policyHolderName, int policyId, Car car, int numberOfClaims, MyDate expiryDate, int driverAge, int level) throws PolicyException {
+  public boolean createComprehensivePolicy(int userID, String policyHolderName, int policyId, Car car, int numberOfClaims, MyDate expiryDate, int driverAge, int level) throws PolicyException, PolicyHolderNameException {
     User user = findUser(userID);
     if (user == null) return false;
     return user.createComprehensivePolicy(policyHolderName, policyId, car, numberOfClaims, expiryDate, driverAge, level);
@@ -395,6 +396,64 @@ public class InsuranceCompany implements Cloneable, Serializable {
     }
   }
 
+  // ASM2
+  public HashMap<String, ArrayList<User>> getUsersPerCity() {
+    HashMap<String, ArrayList<User>> userCityHashMap = new HashMap<>();
+    for (User user : users.values()) {
+      String city = user.getAddress().getCity();
+      ArrayList<User> foundUsers = userCityHashMap.get(city);
+      if (foundUsers == null) foundUsers = new ArrayList<>();
+      foundUsers.add(user);
+      userCityHashMap.put(city, foundUsers);
+    }
+    return userCityHashMap;
+  }
+  
+  public static void reportUsersPerCity(HashMap<String, ArrayList<User>> cityUsersMap, int flatRate) {
+    for (String key : cityUsersMap.keySet()) {
+      int padding = (50 - key.length()) / 2;
+      System.out.format("%" + padding + "s%s%" + padding + "s", "", "City: " + key, "");
+      System.out.println();
+      Object[] titles = new Object[] { "ID", "Name", "Policies", "Total Payment" };
+      System.out.format("%-10s%-15s%10s%15s", titles);
+      System.out.println();
+      ArrayList<User> users = cityUsersMap.get(key);
+      for (User user : users) {
+        Object[] row = new Object[] { user.getUserID(), user.getName(), user.getPolicies().size(), "$" + user.calcTotalPayments(flatRate) };
+        System.out.format("%-10s%-15s%10s%15s", row);
+        System.out.println();
+      }
+      System.out.println();
+    }
+  }
+
+  public HashMap<String, ArrayList<InsurancePolicy>> filterPoliciesByExpiryDate(MyDate expiryDate) {
+    HashMap<String, ArrayList<InsurancePolicy>> userCityHashMap = new HashMap<>();
+    for (User user : users.values()) {
+      ArrayList<InsurancePolicy> expiredPolicies = new ArrayList<>(user.filterByExpiryDate(expiryDate).values());
+      userCityHashMap.put(user.getName(), expiredPolicies);
+    }
+    return userCityHashMap;
+  }
+  
+  public static void reportPoliciesPerUser(HashMap<String, ArrayList<InsurancePolicy>> userPoliciesMap, int flatRate) {
+    for (String key : userPoliciesMap.keySet()) {
+      int padding = (70 - key.length()) / 2;
+      System.out.format("%" + padding + "s%s%" + padding + "s", "", "User: " + key, "");
+      System.out.println();
+      Object[] titles = new Object[] { "ID", "Holder Name", "No. of Claims", "Payment", "Expiry Date" };
+      System.out.format("%-10s%-15s%10s%15s%20s", titles);
+      System.out.println();
+      ArrayList<InsurancePolicy> policies = userPoliciesMap.get(key);
+      for (InsurancePolicy policy : policies) {
+        Object[] row = new Object[] { policy.getId(), policy.getPolicyHolderName(), policy.getNumberOfClaims(), "$" + policy.calcPayment(flatRate), policy.getExpiryDate() };
+        System.out.format("%-10s%-15s%10s%15s%20s", row);
+        System.out.println();
+      }
+      System.out.println();
+    }
+  }
+
   //lab4
   // @Override
   // public InsuranceCompany clone() throws CloneNotSupportedException {
@@ -440,16 +499,23 @@ public class InsuranceCompany implements Cloneable, Serializable {
     return User.deepCopyHashMap(users);
   }
 
-  // public ArrayList<User> sortUsers() throws CloneNotSupportedException {
-  //   ArrayList<User> shallowCopyUsers = User.shallowCopy(users);
-  //   Collections.sort(shallowCopyUsers);
-  //   return shallowCopyUsers;
-  // }
-
   public ArrayList<User> sortUsers() throws CloneNotSupportedException {
     ArrayList<User> shallowCopyUsers = User.shallowCopy(users);
     Collections.sort(shallowCopyUsers);
     return shallowCopyUsers;
+  }
+
+  // ASM2
+  class UserTotalPaymentComparator implements Comparator<User> {
+    public int compare(User firstUser, User secondUser) {
+      return Double.compare(firstUser.calcTotalPayments(flatRate), secondUser.calcTotalPayments(flatRate));
+    }
+  }
+  
+  public ArrayList<User> sortUsersByPremium() {
+    ArrayList<User> usersShallowCopy = User.shallowCopy(users);
+    Collections.sort(usersShallowCopy, new UserTotalPaymentComparator());
+    return usersShallowCopy;
   }
 
   //lab6
@@ -534,6 +600,8 @@ public class InsuranceCompany implements Cloneable, Serializable {
     } catch (IOException e) {
       System.out.println(e);
     } catch (PolicyException e) {
+      System.out.println(e);
+    } catch (PolicyHolderNameException e) {
       System.out.println(e);
     }
     return false;
