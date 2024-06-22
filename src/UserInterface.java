@@ -15,8 +15,7 @@ public class UserInterface {
   public User account;
   Scanner inputReader = new Scanner(System.in);
   InsuranceCompany mainCompany;
-  public UserInterface(InsuranceCompany company)
-  {
+  public UserInterface(InsuranceCompany company) {
     mainCompany = company;        
   }
   

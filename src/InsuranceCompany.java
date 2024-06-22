@@ -532,8 +532,8 @@ public class InsuranceCompany implements Cloneable, Serializable {
       return true;
     } catch(IOException ex) {
       System.err.println(errorMessage);
+      return false;
     }
-    return false;
   }
   
   public boolean load(String fileName) {
@@ -550,10 +550,11 @@ public class InsuranceCompany implements Cloneable, Serializable {
       return true;
     } catch(IOException ex) {
       System.err.println(errorMessage);
+      return false;
     } catch (ClassNotFoundException ex)  {
       System.err.println("Error in wrong class in the file.");
+      return false;
     }
-    return false;
   }
 
   //lab6
@@ -573,8 +574,8 @@ public class InsuranceCompany implements Cloneable, Serializable {
       return true;
     } catch (IOException e) {
       System.out.println(e);
+      return false;
     }
-    return false;
   }
 
   public boolean loadTextFile(String fileName) {
@@ -590,7 +591,7 @@ public class InsuranceCompany implements Cloneable, Serializable {
         String adminPassword = fields[3];
         int flatRate = Integer.parseInt(fields[4]);
         int numberOfUsers = Integer.parseInt(fields[5]);
-        HashMap<Integer, User> extractedUsers = User.extractPoliciesFromFields(numberOfUsers, 6, fields);
+        HashMap<Integer, User> extractedUsers = User.extractUsersFromFields(numberOfUsers, 6, fields);
         InsuranceCompany company = new InsuranceCompany(name, extractedUsers, adminUsername, adminPassword, flatRate);
         initialize(company);
         line = in.readLine();
@@ -599,12 +600,14 @@ public class InsuranceCompany implements Cloneable, Serializable {
       return true;
     } catch (IOException e) {
       System.out.println(e);
+      return false;
     } catch (PolicyException e) {
       System.out.println(e);
+      return false;
     } catch (PolicyHolderNameException e) {
       System.out.println(e);
+      return false;
     }
-    return false;
   }
 
 }
