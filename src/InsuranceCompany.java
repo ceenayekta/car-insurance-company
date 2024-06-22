@@ -1,4 +1,13 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +20,7 @@ public class InsuranceCompany implements Cloneable, Serializable {
   private String adminUsername;
   private String adminPassword;
   private int flatRate;
+  public final static String delimitedKey = "IC";
 
   public InsuranceCompany(String name, HashMap<Integer, User> users, String adminUsername, String adminPassword, int flatRate) {
     this.name = name;
@@ -21,6 +31,13 @@ public class InsuranceCompany implements Cloneable, Serializable {
   }
 
   public InsuranceCompany(InsuranceCompany company) {
+    initialize(company);
+  }
+
+  //lab6
+  public InsuranceCompany() {}
+
+  public void initialize(InsuranceCompany company) {
     this.name = company.name;
     this.adminUsername = company.adminUsername;
     this.adminPassword = company.adminPassword;
@@ -70,7 +87,7 @@ public class InsuranceCompany implements Cloneable, Serializable {
   }
 
   public boolean addUser(String name, Address address) {
-    User user = new User(name, address, null);
+    User user = new User(name, address, null, null);
     return addUser(user);
   }
 
@@ -434,4 +451,94 @@ public class InsuranceCompany implements Cloneable, Serializable {
     Collections.sort(shallowCopyUsers);
     return shallowCopyUsers;
   }
+
+  //lab6
+  public boolean save(String fileName) {
+    String errorMessage = "";
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectOutputStream outputStream = new ObjectOutputStream(Files.newOutputStream(Paths.get(fileName)));
+      errorMessage = "Error in adding the company to the file!";
+      outputStream.writeObject(this);
+      errorMessage = "Error in closing the file!";
+      if (outputStream != null) outputStream.close();
+      errorMessage = "";
+      return true;
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+      return false;
+    }
+  }
+  
+  public boolean load(String fileName) {
+    String errorMessage = "";
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
+      errorMessage = "Error in reading company from file!";
+      InsuranceCompany company = (InsuranceCompany) inputStream.readObject();
+      initialize(company);
+      errorMessage = "Error in closing the file!";
+      if (inputStream != null) inputStream.close();
+      errorMessage = "";
+      return true;
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+      return false;
+    } catch (ClassNotFoundException ex)  {
+      System.err.println("Error in wrong class in the file.");
+      return false;
+    }
+  }
+
+  //lab6
+  public String toDelimitedString() {
+    String result = delimitedKey + "," + name + "," + adminUsername + "," + adminPassword + "," + flatRate + "," + users.size();
+    for (User user : users.values()) {
+      result +=  "," + user.toDelimitedString();
+    }
+    return result;
+  }
+
+  public boolean saveTextFile(String fileName) {
+    try {
+      BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
+      out.write(toDelimitedString());
+      out.close();
+      return true;
+    } catch (IOException e) {
+      System.out.println(e);
+      return false;
+    }
+  }
+
+  public boolean loadTextFile(String fileName) {
+    try {
+      BufferedReader in = new BufferedReader(new FileReader(fileName));
+      String line = in.readLine();
+      while (line != null) {
+        line = line.trim();
+        String[] fields = line.split(",");
+
+        String name = fields[1];
+        String adminUsername = fields[2];
+        String adminPassword = fields[3];
+        int flatRate = Integer.parseInt(fields[4]);
+        int numberOfUsers = Integer.parseInt(fields[5]);
+        HashMap<Integer, User> extractedUsers = User.extractUsersFromFields(numberOfUsers, 6, fields);
+        InsuranceCompany company = new InsuranceCompany(name, extractedUsers, adminUsername, adminPassword, flatRate);
+        initialize(company);
+        line = in.readLine();
+      }
+      in.close();
+      return true;
+    } catch (IOException e) {
+      System.out.println(e);
+      return false;
+    } catch (PolicyException e) {
+      System.out.println(e);
+      return false;
+    }
+  }
+
 }

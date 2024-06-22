@@ -5,6 +5,7 @@ public class Address implements Cloneable, Comparable<Address>, Serializable {
   private String street;
   private String suburb;
   private String city;
+  public final static String delimitedKey = "A";
   
   public Address(int streetNum, String street, String suburb, String city) {
     this.streetNum = streetNum;
@@ -69,5 +70,10 @@ public class Address implements Cloneable, Comparable<Address>, Serializable {
   @Override
   public int compareTo(Address a) {
     return city.compareTo(a.city);
+  }
+
+  //lab6
+  public String toDelimitedString() {
+    return delimitedKey + "," + streetNum + "," + street + "," + suburb + "," + city;
   }
 }

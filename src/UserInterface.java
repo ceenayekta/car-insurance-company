@@ -3,8 +3,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class UserInterface
-{
+public class UserInterface {
   int activeMenu = 0;
   final String RED = "\u001B[31m";
   final String GREEN = "\u001B[32m";
@@ -13,8 +12,7 @@ public class UserInterface
   public User account;
   Scanner inputReader = new Scanner(System.in);
   InsuranceCompany mainCompany;
-  public UserInterface(InsuranceCompany company)
-  {
+  public UserInterface(InsuranceCompany company) {
     mainCompany = company;        
   }
   
@@ -89,7 +87,11 @@ public class UserInterface
       "12. Remove a Policy",
       "13. Remove a User",
       "14. Change Password",
-      "15. Logout"
+      "15. Save Company in TextFile",
+      "16. Load Company from TextFile",
+      "17. Save Company in Binary",
+      "18. Load Company from Binary",
+      "19. Logout"
     );
     List<Runnable> actions = Arrays.asList(
       () -> testCode(),
@@ -106,6 +108,10 @@ public class UserInterface
       () -> removePolicy(null),
       () -> removeUser(),
       () -> changePassword(),
+      () -> saveCompany("company.txt"),
+      () -> loadCompany("company.txt"),
+      () -> serializeCompany("company.ser"),
+      () -> loadSerializedCompany("company.ser"),
       () -> { activeMenu = 1; }
     );
     while(activeMenu > 1) {
@@ -127,7 +133,7 @@ public class UserInterface
       User testUser = new User("Test Only", new Address(0, "Test", "t-test", "Testing"), new HashMap<>() {{
         put(testPolicy.getId(), testPolicy);
         put(testPolicy2.getId(), testPolicy2);
-      }});
+      }}, null);
       mainCompany.addUser(testUser);
       // testing policies sort
       HashMap<Integer, InsurancePolicy> shallowCopyPolicies = User.shallowCopyPoliciesHashMap(testUser.getPolicies());
@@ -139,11 +145,14 @@ public class UserInterface
       testUser.addPolicy(testPolicy3);
       if (testUser.getPolicies().get(testPolicy3.getId()) != null && shallowCopyPolicies.get(testPolicy3.getId()) != null && deepCopyPolicies.get(testPolicy3.getId()) == null) {
         passedCount++;
+        printTestStatus(true);
       } else {
         failedCount++;
+        printTestStatus(false);
       }
       // sort
       testUser.sortPoliciesByDate();
+      printDivider();
       System.out.println("After Sorting Policies");
       System.out.println("Original Policies:");
       InsurancePolicy.printPolicies(testUser.getPolicies());
@@ -155,15 +164,18 @@ public class UserInterface
       HashMap<Integer, User> shallowCopyUsers = InsuranceCompany.shallowCopyUsersHashMap(mainCompany.getUsers());
       HashMap<Integer, User> deepCopyUsers = InsuranceCompany.deepCopyUsersHashMap(mainCompany.getUsers());
       // add new user
-      User testUser2 = new User("Test Only 2", new Address(0, "Test 2", "t-test", "Testing"), null);
+      User testUser2 = new User("Test Only 2", new Address(0, "Test 2", "t-test", "Testing"), null, null);
       mainCompany.addUser(testUser2);
       if (mainCompany.getUsers().get(testUser2.getUserID()) != null && shallowCopyUsers.get(testUser2.getUserID()) == null && deepCopyUsers.get(testUser2.getUserID()) == null) {
         passedCount++;
+        printTestStatus(true);
       } else {
         failedCount++;
+        printTestStatus(false);
       }
       // sort
       mainCompany.sortUsers();
+      printDivider();
       System.out.println("After Sorting Users");
       System.out.println("Original Users:");
       User.printUsers(mainCompany.getUsers());
@@ -172,6 +184,7 @@ public class UserInterface
       System.out.println("Deep Copied Users:");
       User.printUsers(deepCopyUsers);
       // deep copy company
+      printDivider();
       InsuranceCompany deepCopyCompany = mainCompany.clone();
       String storeName = mainCompany.getName();
       mainCompany.setName("Testing Deep Copy");
@@ -181,32 +194,147 @@ public class UserInterface
       deepCopyCompany.print();
       if (mainCompany.getName().equals(deepCopyCompany.getName())) {
         failedCount++;
+        printTestStatus(false);
       } else {
         passedCount++;
+        printTestStatus(true);
       }
       mainCompany.setName(storeName);
+
+      // lab6
+      printDivider();
+      System.out.println("TESTING BINARY SERIALIZATION");
+      printDivider();
+      printDivider();
+      String serFileNamePolicies = "policiesTest.ser";
+      System.out.println("List of Policies:");
+      InsurancePolicy.printPolicies(testUser.getPolicies());
+      System.out.println("Saving Policies...");
+      InsurancePolicy.save(testUser.getPolicies(), serFileNamePolicies);
+      System.out.println("List of Saved Policies:");
+      HashMap<Integer, InsurancePolicy> savedPolicies = InsurancePolicy.load(serFileNamePolicies);
+      InsurancePolicy.printPolicies(savedPolicies);
+      if (savedPolicies.size() > 0) {
+        passedCount++;
+        printTestStatus(true);
+      } else {
+        failedCount++;
+        printTestStatus(false);
+      }
+      printDivider();
+      String serFileNameUsers = "usersTest.ser";
+      System.out.println("List of Users:");
+      User.printUsers(mainCompany.getUsers());
+      System.out.println("Saving Users...");
+      User.save(mainCompany.getUsers(), serFileNameUsers);
+      System.out.println("List of Saved Users:");
+      HashMap<Integer, User> savedUsers = User.load(serFileNameUsers);
+      User.printUsers(savedUsers);
+      if (savedUsers.size() > 0) {
+        passedCount++;
+        printTestStatus(true);
+      } else {
+        failedCount++;
+        printTestStatus(false);
+      }
+      printDivider();
+      String serFileNameCompany = "companyTest.ser";
+      System.out.println("Deep Copy of Company:");
+      deepCopyCompany.print();
+      System.out.println("Saving Deep Copy of Company...");
+      deepCopyCompany.save(serFileNameCompany);
+      System.out.println("Clone and Re-initialized Company:");
+      InsuranceCompany clonedCompany = new InsuranceCompany();
+      clonedCompany.load(serFileNameCompany);
+      clonedCompany.print();
+      if (mainCompany.getName().equals(clonedCompany.getName())) {
+        passedCount++;
+        printTestStatus(true);
+      } else {
+        failedCount++;
+        printTestStatus(false);
+      }
+
+      printDivider();
+      System.out.println("TESTING FILES");
+      printDivider();
+      printDivider();
+      String fileNamePolicies = "policies.txt";
+      System.out.println("List of Policies:");
+      InsurancePolicy.printPolicies(testUser.getPolicies());
+      System.out.println("Saving Policies...");
+      InsurancePolicy.saveTextFile(testUser.getPolicies(), fileNamePolicies);
+      System.out.println("List of Saved Policies:");
+      HashMap<Integer, InsurancePolicy> extractedPolicies = InsurancePolicy.loadTextFile(fileNamePolicies);
+      InsurancePolicy.printPolicies(extractedPolicies);
+      if (extractedPolicies.size() > 0) {
+        passedCount++;
+        printTestStatus(true);
+      } else {
+        failedCount++;
+        printTestStatus(false);
+      }
+      printDivider();
+      String fileNameUsers = "users.txt";
+      System.out.println("List of Users:");
+      User.printUsers(mainCompany.getUsers());
+      System.out.println("Saving Users...");
+      User.saveTextFile(mainCompany.getUsers(), fileNameUsers);
+      System.out.println("List of Saved Users:");
+      HashMap<Integer, User> extractedUsers = User.loadTextFile(fileNameUsers);
+      User.printUsers(extractedUsers);
+      if (extractedUsers.size() > 0) {
+        passedCount++;
+        printTestStatus(true);
+      } else {
+        failedCount++;
+        printTestStatus(false);
+      }
+      printDivider();
+      String fileNameCompany = "company.txt";
+      System.out.println("Deep Copy of Company:");
+      mainCompany.print();
+      System.out.println("Saving Deep Copy of Company...");
+      mainCompany.saveTextFile(fileNameCompany);
+      System.out.println("Clone and Re-initialized Company:");
+      InsuranceCompany clonedCompany2 = new InsuranceCompany();
+      clonedCompany2.loadTextFile(fileNameCompany);
+      clonedCompany2.print();
+      if (mainCompany.getName().equals(clonedCompany2.getName())) {
+        passedCount++;
+        printTestStatus(true);
+      } else {
+        failedCount++;
+        printTestStatus(false);
+      }
+
     } catch (CloneNotSupportedException e) {
       System.out.println("Cloning not supported! Initial tests Skipped.");
     } catch (PolicyException e) {
       System.out.println("A policy id is out of range! Initial tests Skipped.");
     }
 
+    //lab5
     try {
       System.out.println("Testing out of range policy id");
       new ComprehensivePolicy(1, null, 0, "", null, 0, 0);
       failedCount++;
+      printTestStatus(false);
     } catch (PolicyException e) {
       System.out.println(e);
       passedCount++;
+      printTestStatus(true);
     }
 
     try {
       System.out.println("Testing in range policy id");
       new ComprehensivePolicy(InsurancePolicy.generateRandomId(), null, 0, "", null, 0, 0);
       passedCount++;
+      printTestStatus(true);
     } catch (PolicyException e) {
       System.out.println(e);
       failedCount++;
+      printTestStatus(false);
     }
 
     System.out.println("Overall Result (" + (passedCount + failedCount) +"): " + GREEN + passedCount + "passed , " + RED + failedCount + "failed" + DEFAULT);
@@ -216,7 +344,7 @@ public class UserInterface
     System.out.print("Enter user's name: ");
     String name = inputReader.nextLine();
     Address address = getAddress();
-    User newUser = new User(name, address, null);
+    User newUser = new User(name, address, null, null);
     mainCompany.addUser(newUser);
   }
   
@@ -362,6 +490,50 @@ public class UserInterface
     } else {
       System.out.println("Confirm password did not match.");
     }
+  }
+
+  public void saveCompany(String fileName) {
+    System.out.println("Saving Company...");
+    if (mainCompany.saveTextFile(fileName)) {
+      System.out.println("Successfully Saved!");
+    } else {
+      System.out.println("Failed Saving!");
+    }
+    System.out.println();
+  }
+
+  public void loadCompany(String fileName) {
+    System.out.println("Loading Company...");
+    if (mainCompany.loadTextFile(fileName)) {
+      System.out.println("Successfully Loaded!");
+    } else {
+      System.out.println("Failed Loading!");
+    }
+    System.out.println();
+  }
+
+  public void serializeCompany(String fileName) {
+    System.out.println("Saving Company...");
+    try {
+      if (mainCompany.clone().save(fileName)) {
+        System.out.println("Successfully Saved!");
+      } else {
+        System.out.println("Failed Saving!");
+      }
+      System.out.println();
+    } catch (CloneNotSupportedException e) {
+      System.out.println("Not Supported!");
+    }
+  }
+
+  public void loadSerializedCompany(String fileName) {
+    System.out.println("Loading Company...");
+    if (mainCompany.load(fileName)) {
+      System.out.println("Successfully Loaded!");
+    } else {
+      System.out.println("Failed Loading!");
+    }
+    System.out.println();
   }
 
   public void totalPaymentPerCarModelAggregation(User user) {
@@ -585,5 +757,13 @@ public class UserInterface
     int price = getRestrictedInt(0, null, "Enter car price ");
     Car car = new Car(carModel, carType, year, price);
     return car;
+  }
+
+  public void printDivider() {
+    System.out.println("__________________________________________________");
+  }
+
+  public void printTestStatus(boolean passed) {
+    System.out.println((passed ? GREEN + "TEST PASSED" : RED + "TEST FAILED") + DEFAULT);
   }
 }

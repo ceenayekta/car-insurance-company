@@ -1,6 +1,7 @@
 public class ComprehensivePolicy extends InsurancePolicy {
   private int driverAge;
   private int level;
+  public final static String delimitedKey = "CP";
 
   public ComprehensivePolicy(int id, Car car, int numberOfClaims, String policyHolderName, MyDate expiryDate, int driverAge, int level) throws PolicyException {
     super(id, car, numberOfClaims, policyHolderName, expiryDate);
@@ -53,6 +54,10 @@ public class ComprehensivePolicy extends InsurancePolicy {
   @Override
   public ComprehensivePolicy clone() throws CloneNotSupportedException {
     return (ComprehensivePolicy) super.clone();
-    
+  }
+
+  //lab6
+  public String toDelimitedString() {
+    return delimitedKey + "," + super.toDelimitedString() + "," + driverAge + "," + level;
   }
 }

@@ -1,26 +1,38 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.EOFException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
 public class User implements Cloneable, Comparable<User>, Serializable {
   public static int idCounter = 0;
-  private String name;
   private int userID;
+  private String name;
   private Address address;
   // private ArrayList<InsurancePolicy> policies;
   private HashMap<Integer, InsurancePolicy> policies;
+  public final static String delimitedKey = "U";
 
   public User(
     String name,
     Address address,
-    HashMap<Integer, InsurancePolicy> policies
+    HashMap<Integer, InsurancePolicy> policies,
+    Integer userID
   ) {
     this.name = name;
-    this.userID = idCounter;
+    this.userID = userID == null ? idCounter : userID;
     this.address = address;
     this.policies = policies == null ? new HashMap<Integer, InsurancePolicy>() : policies;
-    idCounter++;
+    if (userID == null) idCounter++;
   }
 
   public User(User user) {
@@ -338,5 +350,125 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     ArrayList<InsurancePolicy> shallowCopyPolicies = InsurancePolicy.shallowCopy(policies);
     Collections.sort(shallowCopyPolicies);
     return shallowCopyPolicies;
+  }
+
+  //lab6
+  public static boolean save(HashMap<Integer, User> users, String fileName) {
+    String errorMessage = "";
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectOutputStream outputStream = new ObjectOutputStream(Files.newOutputStream(Paths.get(fileName)));
+      errorMessage = "Error in adding users to the file!";
+      for (User user : users.values()) {
+        outputStream.writeObject(user);
+      }
+      errorMessage = "Error in closing the file!";
+      if (outputStream !=null) outputStream.close();
+      errorMessage = "";
+      return true;
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+      return false;
+    }
+  }
+  
+  public static HashMap<Integer, User> load(String fileName) {
+    String errorMessage = "";
+    HashMap<Integer, User> users = new HashMap<Integer, User>();
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
+      errorMessage = "Error in reading users from file!";
+
+      try {
+        while(true) {
+          User user = (User) inputStream.readObject();
+          users.put(user.userID, user);
+        }
+      } catch(EOFException ex) {
+        System.out.println("End of " + fileName + ".");
+      }
+
+      errorMessage = "Error in closing the file!";
+      if (inputStream != null) inputStream.close();
+      errorMessage = "";
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+    } catch (ClassNotFoundException ex)  {
+      System.err.println("Error in wrong class in the file.");
+    }
+    return users;
+  }
+
+  public String toDelimitedString() {
+    String result = delimitedKey + "," + userID + "," + name + "," + address.toDelimitedString() + "," + policies.size();
+    for (InsurancePolicy policy : policies.values()) {
+      result += "," + policy.toDelimitedString();
+    }
+    return result;
+  }
+
+  public static boolean saveTextFile(HashMap<Integer, User> users, String fileName) {
+    try {
+      BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
+      for (User user : users.values()) {
+        out.write(user.toDelimitedString() + "\n");
+      }
+      out.close();
+      return true;
+    } catch (IOException e) {
+      System.out.println(e);
+      return false;
+    }
+  }
+
+  public static HashMap<Integer, User> loadTextFile(String fileName) {
+    HashMap<Integer, User> users = new HashMap<>();
+    try {
+      BufferedReader in = new BufferedReader(new FileReader(fileName));
+      String line = in.readLine();
+      while (line != null) {
+        line = line.trim();
+        String[] fields = line.split(",");
+        int userID = Integer.parseInt(fields[1]);
+        User extractedUser = extractUsersFromFields(1, 0, fields).get(userID);
+        users.put(userID, extractedUser);
+        line = in.readLine();
+      }
+      in.close();
+    } catch (IOException e) {
+      System.out.println(e);
+    } catch (PolicyException e) {
+      System.out.println(e);
+    }
+    return users;
+  }
+
+  public static HashMap<Integer, User> extractUsersFromFields(int numberOfUsers, int startIndex, String[] fields) throws PolicyException {
+    HashMap<Integer, User> users = new HashMap<>();
+    for(int i = 0; i < numberOfUsers; i++) {
+      // String delimitedKey = fields[startIndex + 0];
+      int userID = Integer.parseInt(fields[startIndex + 1]);
+      String name = fields[startIndex + 2];
+      int streetNum = Integer.parseInt(fields[startIndex + 4]);
+      String street = fields[startIndex + 5];
+      String suburb = fields[startIndex + 6];
+      String city = fields[startIndex + 7];
+      int numberOfPolicies = Integer.parseInt(fields[startIndex + 8]);
+
+      Address address = new Address(streetNum, street, suburb, city);
+      HashMap<Integer, InsurancePolicy> policies = InsurancePolicy.extractPoliciesFromFields(numberOfPolicies, startIndex + 9, fields);
+      User user = new User(name, address, policies, userID);
+      users.put(userID, user);
+
+      // evaluate startIndex for next step
+      startIndex += 8;
+      for (InsurancePolicy policy : policies.values()) {
+        if (policy instanceof ComprehensivePolicy) startIndex += 15;
+        if (policy instanceof ThirdPartyPolicy) startIndex += 14;
+      }
+      startIndex++;
+    }
+    return users;
   }
 }

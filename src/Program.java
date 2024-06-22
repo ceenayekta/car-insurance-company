@@ -172,9 +172,9 @@ public class Program {
     Car car6 = new Car("Lamborghini", CarType.HATCH, 2005, 5677);
     
     // migrate users
-    User user1 = new User("John Doe", new Address(21, "Eastern", "J15r", "Manhattan"), null);
-    User user2 = new User("Foo Bar", new Address(13, "Golden State", "P21W", "New York"), null);
-    User user3 = new User("James Bond", new Address(15, "Southern", "4DS2", "Toronto"), null);
+    User user1 = new User("John Doe", new Address(21, "Eastern", "J15r", "Manhattan"), null, null);
+    User user2 = new User("Foo Bar", new Address(13, "Golden State", "P21W", "New York"), null, null);
+    User user3 = new User("James Bond", new Address(15, "Southern", "4DS2", "Toronto"), null, null);
     try {
       // migrate policies
       ComprehensivePolicy compPolicy1 = new ComprehensivePolicy(InsurancePolicy.generateRandomId(), car1, 1, "Simple Policy 1", new MyDate(2024, 6, 19), 24, 1);

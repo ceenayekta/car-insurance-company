@@ -1,4 +1,14 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.EOFException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -233,7 +243,7 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
     return deepCopy;
   }
 
-  static public int generateRandomId() {
+  public static int generateRandomId() {
     return (int) ((Math.random() * (idRange[1] - idRange[0])) + idRange[0]);
   }
 
@@ -241,6 +251,132 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
   public int compareTo(InsurancePolicy ip) {
     return expiryDate.compareTo(ip.expiryDate);
   }
+
+  //lab6
+  public static boolean save(HashMap<Integer, InsurancePolicy> policies, String fileName) {
+    String errorMessage = "";
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectOutputStream outputStream = new ObjectOutputStream(Files.newOutputStream(Paths.get(fileName)));
+      errorMessage = "Error in adding policies to the file!";
+      for (InsurancePolicy policy : policies.values()) {
+        outputStream.writeObject(policy);
+      }
+      errorMessage = "Error in closing the file!";
+      if (outputStream != null) outputStream.close();
+      errorMessage = "";
+      return true;
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+      return false;
+    }
+  }
+  
+  public static HashMap<Integer, InsurancePolicy> load(String fileName) {
+    String errorMessage = "";
+    HashMap<Integer, InsurancePolicy> policies = new HashMap<Integer, InsurancePolicy>();
+    try {
+      errorMessage = "Error in create/open the file!";
+      ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
+      errorMessage = "Error in reading policies from file!";
+
+      try {
+        while(true) {
+          InsurancePolicy policy = (InsurancePolicy) inputStream.readObject();
+          policies.put(policy.id, policy);
+        }
+      } catch(EOFException ex) {
+        System.out.println("End of " + fileName + ".");
+      }
+
+      errorMessage = "Error in closing the file!";
+      if (inputStream != null) inputStream.close();
+      errorMessage = "";
+    } catch(IOException ex) {
+      System.err.println(errorMessage);
+    } catch (ClassNotFoundException ex)  {
+      System.err.println("Error in wrong class in the file.");
+    }
+    return policies;
+  }
+
+  public String toDelimitedString() {
+    return "" + id + "," + car.toDelimitedString() + "," + numberOfClaims + "," + policyHolderName + "," + expiryDate.toDelimitedString();
+  }
+    
+  public static boolean saveTextFile(HashMap<Integer, InsurancePolicy> policies, String fileName) {
+    try {
+      BufferedWriter out = new BufferedWriter(new FileWriter(fileName));
+      for (InsurancePolicy policy : policies.values()) {
+        out.write(policy.toDelimitedString() + "\n");
+      }
+      out.close();
+      return true;
+    } catch (IOException e) {
+      System.out.println(e);
+      return false;
+    }
+  }
+
+  public static HashMap<Integer, InsurancePolicy> loadTextFile(String fileName) {
+    HashMap<Integer, InsurancePolicy> policies = new HashMap<>();
+    try {
+      BufferedReader in = new BufferedReader(new FileReader(fileName));
+      String line = in.readLine();
+      while (line != null) {
+        line = line.trim();
+        String[] fields = line.split(",");
+        int id = Integer.parseInt(fields[1]);
+        InsurancePolicy extractedPolicy = extractPoliciesFromFields(1, 0, fields).get(id);
+        policies.put(id, extractedPolicy);
+        line = in.readLine();
+      }
+      in.close();
+    } catch (IOException e) {
+      System.out.println(e);
+    } catch (PolicyException e) {
+      System.out.println(e);
+    }
+    return policies;
+  }
+
+  public static HashMap<Integer, InsurancePolicy> extractPoliciesFromFields(int numberOfPolicies, int startIndex, String[] fields) throws PolicyException {
+    HashMap<Integer, InsurancePolicy> policies = new HashMap<>();
+    for(int i = 0; i < numberOfPolicies; i++) {
+      String delimitedKey = fields[startIndex + 0];
+      int id = Integer.parseInt(fields[startIndex + 1]);
+      String model = fields[startIndex + 3];
+      CarType type = CarType.valueOf(fields[startIndex + 4]);
+      int manufacturingYear = Integer.parseInt(fields[startIndex + 5]);
+      double price = Double.parseDouble(fields[startIndex + 6]);
+      int numberOfClaims = Integer.parseInt(fields[startIndex + 7]);
+      String policyHolderName = fields[startIndex + 8];
+      int year = Integer.parseInt(fields[startIndex + 10]);
+      int month = Integer.parseInt(fields[startIndex + 11]);
+      int day = Integer.parseInt(fields[startIndex + 12]);
+      Car car = new Car(model, type, manufacturingYear, price);
+      MyDate expiryDate = new MyDate(year, month, day);
+
+      switch (delimitedKey) {
+        case ComprehensivePolicy.delimitedKey:
+          int driverAge = Integer.parseInt(fields[startIndex + 13]);
+          int level = Integer.parseInt(fields[startIndex + 14]);
+          ComprehensivePolicy newComprehensivePolicy = new ComprehensivePolicy(id, car, numberOfClaims, policyHolderName, expiryDate, driverAge, level);
+          policies.put(id, newComprehensivePolicy);
+          startIndex += 14;
+          break;
+        case ThirdPartyPolicy.delimitedKey:
+          String comments = fields[startIndex + 13];
+          ThirdPartyPolicy newThirdPartyPolicy = new ThirdPartyPolicy(id, car, numberOfClaims, policyHolderName, expiryDate, comments);
+          policies.put(id, newThirdPartyPolicy);
+          startIndex += 13;
+          break;    
+      }
+      startIndex++;
+    }
+    return policies;
+  }
+
 }
 
 class PolicyException extends Exception
