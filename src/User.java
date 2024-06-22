@@ -368,8 +368,8 @@ public class User implements Cloneable, Comparable<User>, Serializable {
       return true;
     } catch(IOException ex) {
       System.err.println(errorMessage);
+      return false;
     }
-    return false;
   }
   
   public static HashMap<Integer, User> load(String fileName) {
@@ -418,8 +418,8 @@ public class User implements Cloneable, Comparable<User>, Serializable {
       return true;
     } catch (IOException e) {
       System.out.println(e);
+      return false;
     }
-    return false;
   }
 
   public static HashMap<Integer, User> loadTextFile(String fileName) {
@@ -431,7 +431,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
         line = line.trim();
         String[] fields = line.split(",");
         int userID = Integer.parseInt(fields[1]);
-        User extractedUser = extractPoliciesFromFields(1, 0, fields).get(userID);
+        User extractedUser = extractUsersFromFields(1, 0, fields).get(userID);
         users.put(userID, extractedUser);
         line = in.readLine();
       }
@@ -444,7 +444,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return users;
   }
 
-  public static HashMap<Integer, User> extractPoliciesFromFields(int numberOfUsers, int startIndex, String[] fields) throws PolicyException {
+  public static HashMap<Integer, User> extractUsersFromFields(int numberOfUsers, int startIndex, String[] fields) throws PolicyException {
     HashMap<Integer, User> users = new HashMap<>();
     for(int i = 0; i < numberOfUsers; i++) {
       // String delimitedKey = fields[startIndex + 0];
@@ -461,6 +461,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
       User user = new User(name, address, policies, userID);
       users.put(userID, user);
 
+      // evaluate startIndex for next step
       startIndex += 8;
       for (InsurancePolicy policy : policies.values()) {
         if (policy instanceof ComprehensivePolicy) startIndex += 15;

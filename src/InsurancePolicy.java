@@ -268,8 +268,8 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
       return true;
     } catch(IOException ex) {
       System.err.println(errorMessage);
+      return false;
     }
-    return false;
   }
   
   public static HashMap<Integer, InsurancePolicy> load(String fileName) {
@@ -314,8 +314,8 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
       return true;
     } catch (IOException e) {
       System.out.println(e);
+      return false;
     }
-    return false;
   }
 
   public static HashMap<Integer, InsurancePolicy> loadTextFile(String fileName) {
