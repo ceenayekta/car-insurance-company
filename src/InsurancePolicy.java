@@ -357,37 +357,37 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
 
   public static HashMap<Integer, InsurancePolicy> extractPoliciesFromFields(int numberOfPolicies, int startIndex, String[] fields) throws PolicyException, PolicyHolderNameException {
     HashMap<Integer, InsurancePolicy> policies = new HashMap<>();
+    if (numberOfPolicies == 0 || fields.length == 0) return policies;
     for(int i = 0; i < numberOfPolicies; i++) {
-      String delimitedKey = fields[startIndex + 0];
-      int id = Integer.parseInt(fields[startIndex + 1]);
-      String model = fields[startIndex + 3];
-      CarType type = CarType.valueOf(fields[startIndex + 4]);
-      int manufacturingYear = Integer.parseInt(fields[startIndex + 5]);
-      double price = Double.parseDouble(fields[startIndex + 6]);
-      int numberOfClaims = Integer.parseInt(fields[startIndex + 7]);
-      String policyHolderName = fields[startIndex + 8];
-      int year = Integer.parseInt(fields[startIndex + 10]);
-      int month = Integer.parseInt(fields[startIndex + 11]);
-      int day = Integer.parseInt(fields[startIndex + 12]);
+      String delimitedKey = fields[startIndex++];
+      int id = Integer.parseInt(fields[startIndex++]);
+      startIndex++; // carDelimitedKey
+      String model = fields[startIndex++];
+      CarType type = CarType.valueOf(fields[startIndex++]);
+      int manufacturingYear = Integer.parseInt(fields[startIndex++]);
+      double price = Double.parseDouble(fields[startIndex++]);
+      int numberOfClaims = Integer.parseInt(fields[startIndex++]);
+      String policyHolderName = fields[startIndex++];
+      startIndex++; // dateDelimitedKey
+      int year = Integer.parseInt(fields[startIndex++]);
+      int month = Integer.parseInt(fields[startIndex++]);
+      int day = Integer.parseInt(fields[startIndex++]);
       Car car = new Car(model, type, manufacturingYear, price);
       MyDate expiryDate = new MyDate(year, month, day);
 
       switch (delimitedKey) {
         case ComprehensivePolicy.delimitedKey:
-          int driverAge = Integer.parseInt(fields[startIndex + 13]);
-          int level = Integer.parseInt(fields[startIndex + 14]);
+          int driverAge = Integer.parseInt(fields[startIndex++]);
+          int level = Integer.parseInt(fields[startIndex++]);
           ComprehensivePolicy newComprehensivePolicy = new ComprehensivePolicy(id, car, numberOfClaims, policyHolderName, expiryDate, driverAge, level);
           policies.put(id, newComprehensivePolicy);
-          startIndex += 14;
           break;
         case ThirdPartyPolicy.delimitedKey:
-          String comments = fields[startIndex + 13];
+          String comments = fields[startIndex++];
           ThirdPartyPolicy newThirdPartyPolicy = new ThirdPartyPolicy(id, car, numberOfClaims, policyHolderName, expiryDate, comments);
           policies.put(id, newThirdPartyPolicy);
-          startIndex += 13;
           break;    
       }
-      startIndex++;
     }
     return policies;
   }
