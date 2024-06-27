@@ -17,7 +17,6 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   public static int idCounter = 0;
   private int userID;
   private String name;
-  private String username;
   private String password;
   private Address address;
   // private ArrayList<InsurancePolicy> policies;
@@ -26,14 +25,12 @@ public class User implements Cloneable, Comparable<User>, Serializable {
 
   public User(
     String name,
-    String username,
     String password,
     Address address,
     HashMap<Integer, InsurancePolicy> policies,
     Integer userID
   ) {
     this.name = name;
-    this.username = username;
     this.password = password;
     this.userID = userID == null ? idCounter : userID;
     this.address = address;
@@ -71,10 +68,6 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return name;
   }
 
-  public String getUsername() {
-    return username;
-  }
-
   public String getPassword() {
     return password;
   }
@@ -99,8 +92,8 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     address.setCity(city);
   }
   
-  public boolean validateUser(String username, String password) {
-    return this.username.equals(username) && this.password.equals(password);
+  public boolean validateUser(int userID, String password) {
+    return this.userID == userID && this.password.equals(password);
   }
 
   public void print() {
@@ -120,8 +113,8 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return string + "}";
   }
 
-  public void printPolicies(String username, String password, int flatRate) {
-    if (!validateUser(username, password)) return;
+  public void printPolicies(int userID, String password, int flatRate) {
+    if (!validateUser(userID, password)) return;
     System.out.println("");
     for (InsurancePolicy policy : policies.values()) {
       policy.print();
@@ -143,21 +136,21 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     }
   }
 
-  public boolean addPolicy(String username, String password, InsurancePolicy policy) {
+  public boolean addPolicy(int userID, String password, InsurancePolicy policy) {
     // return policies.add(policy);
-    if (!validateUser(username, password)) return false;
-    if (findPolicy(username, password, policy.getId()) != null) return false;
+    if (!validateUser(userID, password)) return false;
+    if (findPolicy(userID, password, policy.getId()) != null) return false;
     return policies.put(policy.getId(), policy) == null;
   }
 
-  public boolean removePolicy(String username, String password, InsurancePolicy policy) {
-    if (!validateUser(username, password)) return false;
+  public boolean removePolicy(int userID, String password, InsurancePolicy policy) {
+    if (!validateUser(userID, password)) return false;
     // return policies.remove(policy);
     return policies.remove(policy.getId(), policy);
   }
 
-  public InsurancePolicy findPolicy(String username, String password, int policyId) {
-    if (!validateUser(username, password)) return null;
+  public InsurancePolicy findPolicy(int userID, String password, int policyId) {
+    if (!validateUser(userID, password)) return null;
     // for (InsurancePolicy policy : policies) {
     //   if (policy.getId() == policyId) return policy;
     // }
@@ -165,13 +158,13 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return policies.get(policyId);
   }
 
-  public double calcTotalPayments(String username, String password, int flatRate) {
-    if (!validateUser(username, password)) return 0;
+  public double calcTotalPayments(int userID, String password, int flatRate) {
+    if (!validateUser(userID, password)) return 0;
     return InsurancePolicy.calcTotalPayments(policies, flatRate);
   }
 
-  public void carRisePriceAll(String username, String password, double risePercent) {
-    if (!validateUser(username, password)) return;
+  public void carRisePriceAll(int userID, String password, double risePercent) {
+    if (!validateUser(userID, password)) return;
     InsurancePolicy.carPriceRiseAll(policies, risePercent);
   }
 
@@ -179,8 +172,8 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   //   return InsurancePolicy.filterByCarModel(policies, carModel);
   // }
 
-  public HashMap<Integer, InsurancePolicy> filterByCarModel(String username, String password, String carModel) {
-    if (!validateUser(username, password)) return new HashMap<>();
+  public HashMap<Integer, InsurancePolicy> filterByCarModel(int userID, String password, String carModel) {
+    if (!validateUser(userID, password)) return new HashMap<>();
     return InsurancePolicy.filterByCarModel(policies, carModel);
   }
 
@@ -188,29 +181,29 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   //   return InsurancePolicy.filterByExpiryDate(policies, date);
   // }
 
-  public HashMap<Integer, InsurancePolicy> filterByExpiryDate(String username, String password, MyDate date) {
-    if (!validateUser(username, password)) return new HashMap<>();
+  public HashMap<Integer, InsurancePolicy> filterByExpiryDate(int userID, String password, MyDate date) {
+    if (!validateUser(userID, password)) return new HashMap<>();
     return InsurancePolicy.filterByExpiryDate(policies, date);
   }
 
   //lab3
-  public boolean createThirdPartyPolicy(String username, String password, String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, String comments) throws PolicyException, PolicyHolderNameException {
-    if (!validateUser(username, password)) return false;
-    if (findPolicy(username, password, id) != null) return false;
+  public boolean createThirdPartyPolicy(int userID, String password, String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, String comments) throws PolicyException, PolicyHolderNameException {
+    if (!validateUser(userID, password)) return false;
+    if (findPolicy(userID, password, id) != null) return false;
     ThirdPartyPolicy thirdPartyPolicy = new ThirdPartyPolicy(id, car, numberOfClaims, policyHolderName, expiryDate, comments);
-    return addPolicy(username, password, thirdPartyPolicy);
+    return addPolicy(userID, password, thirdPartyPolicy);
   }
 
-  public boolean createComprehensivePolicy(String username, String password, String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, int driverAge, int level) throws PolicyException, PolicyHolderNameException {
-    if (!validateUser(username, password)) return false;
-    if (findPolicy(username, password, id) != null) return false;
+  public boolean createComprehensivePolicy(int userID, String password, String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, int driverAge, int level) throws PolicyException, PolicyHolderNameException {
+    if (!validateUser(userID, password)) return false;
+    if (findPolicy(userID, password, id) != null) return false;
     ComprehensivePolicy comprehensivePolicy = new ComprehensivePolicy(id, car, numberOfClaims, policyHolderName, expiryDate, driverAge, level);
-    return addPolicy(username, password, comprehensivePolicy);
+    return addPolicy(userID, password, comprehensivePolicy);
   }
 
   // Assignment 1
-  public ArrayList<String> populateDistinctCarModels(String user, String password) {
-    if (!validateUser(username, password)) return new ArrayList<>();
+  public ArrayList<String> populateDistinctCarModels(int userID, String password) {
+    if (!validateUser(userID, password)) return new ArrayList<>();
     ArrayList<String> result = new ArrayList<>();
     for (InsurancePolicy policy : policies.values()) {
       String model = policy.getCar().getModel();
@@ -221,9 +214,9 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return result;
   }
   
-  public int getTotalCountForCarModel(String username, String password, String carModel) {
+  public int getTotalCountForCarModel(int userID, String password, String carModel) {
     int count = 0;
-    if (!validateUser(username, password)) return count;
+    if (!validateUser(userID, password)) return count;
     for (InsurancePolicy policy : policies.values()) {
       if (policy.getCar().getModel().equals(carModel)) {
         count++;
@@ -233,9 +226,9 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   }
   
   //lab5
-  public HashMap<String, Integer> getTotalCountForCarModel(String user, String password) {
+  public HashMap<String, Integer> getTotalCountForCarModel(int userID, String password) {
     HashMap<String, Integer> counts = new HashMap<String, Integer>();
-    if (!validateUser(username, password)) return counts;
+    if (!validateUser(userID, password)) return counts;
     for (InsurancePolicy policy : policies.values()) {
       Integer count = counts.get(policy.getCar().getModel());
       count = count == null ? 1 : count + 1;
@@ -244,16 +237,16 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return counts;
   }
 
-  public double getTotalPaymentForCarModel(String username, String password, String carModel, int flatRate) {
-    if (!validateUser(username, password)) return 0;
+  public double getTotalPaymentForCarModel(int userID, String password, String carModel, int flatRate) {
+    if (!validateUser(userID, password)) return 0;
     HashMap<Integer, InsurancePolicy> filteredPolicies = InsurancePolicy.filterByCarModel(policies, carModel);
     return InsurancePolicy.calcTotalPayments(filteredPolicies, flatRate);
   }
   
   //lab5
-  public HashMap<String, Double> getTotalPaymentForCarModel(String username, String password, int flatRate) {
+  public HashMap<String, Double> getTotalPaymentForCarModel(int userID, String password, int flatRate) {
     HashMap<String, Double> totals = new HashMap<String, Double>();
-    if (!validateUser(username, password)) return totals;
+    if (!validateUser(userID, password)) return totals;
     for (InsurancePolicy policy : policies.values()) {
       Double total = totals.get(policy.getCar().getModel());
       Double calculatedTotal = policy.calcPayment(flatRate);
@@ -263,20 +256,20 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return totals;
   }
 
-  public ArrayList<Integer> getTotalCountPerCarModel(String username, String password, ArrayList<String> carModels) {
+  public ArrayList<Integer> getTotalCountPerCarModel(int userID, String password, ArrayList<String> carModels) {
     ArrayList<Integer> carModelCounts = new ArrayList<>();
-    if (!validateUser(username, password)) return carModelCounts;
-    for (String carModel : populateDistinctCarModels(username, password)) {
-      carModelCounts.add(getTotalCountForCarModel(username, password, carModel));
+    if (!validateUser(userID, password)) return carModelCounts;
+    for (String carModel : populateDistinctCarModels(userID, password)) {
+      carModelCounts.add(getTotalCountForCarModel(userID, password, carModel));
     }
     return carModelCounts;
   }
 
-  public ArrayList<Double> getTotalPaymentPerCarModel(String username, String password, ArrayList<String> carModels, int flatRate) {
+  public ArrayList<Double> getTotalPaymentPerCarModel(int userID, String password, ArrayList<String> carModels, int flatRate) {
     ArrayList<Double> totalPaymentPerCars = new ArrayList<>();
-    if (!validateUser(username, password)) return totalPaymentPerCars;
-    for (String carModel : populateDistinctCarModels(username, password)) {
-      totalPaymentPerCars.add(getTotalPaymentForCarModel(username, password, carModel, flatRate));
+    if (!validateUser(userID, password)) return totalPaymentPerCars;
+    for (String carModel : populateDistinctCarModels(userID, password)) {
+      totalPaymentPerCars.add(getTotalPaymentForCarModel(userID, password, carModel, flatRate));
     }
     return totalPaymentPerCars;
   }
@@ -362,23 +355,23 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return deepCopy;
   }
   
-  public ArrayList<InsurancePolicy> shallowCopyPolicies(String username, String password) {
-    if (!validateUser(username, password)) return new ArrayList<>();
+  public ArrayList<InsurancePolicy> shallowCopyPolicies(int userID, String password) {
+    if (!validateUser(userID, password)) return new ArrayList<>();
     return InsurancePolicy.shallowCopy(policies);
   }
   
-  public HashMap<Integer, InsurancePolicy> shallowCopyPoliciesHashMap(String username, String password) {
-    if (!validateUser(username, password)) return new HashMap<>();
+  public HashMap<Integer, InsurancePolicy> shallowCopyPoliciesHashMap(int userID, String password) {
+    if (!validateUser(userID, password)) return new HashMap<>();
     return InsurancePolicy.shallowCopyHashMap(policies);
   }
 
-	public ArrayList<InsurancePolicy> deepCopyPolicies(String username, String password) throws CloneNotSupportedException {
-    if (!validateUser(username, password)) return new ArrayList<>();
+	public ArrayList<InsurancePolicy> deepCopyPolicies(int userID, String password) throws CloneNotSupportedException {
+    if (!validateUser(userID, password)) return new ArrayList<>();
     return InsurancePolicy.deepCopy(policies);
   }
 
-	public HashMap<Integer, InsurancePolicy> deepCopyPoliciesHashMap(String username, String password) throws CloneNotSupportedException {
-    if (!validateUser(username, password)) return new HashMap<>();
+	public HashMap<Integer, InsurancePolicy> deepCopyPoliciesHashMap(int userID, String password) throws CloneNotSupportedException {
+    if (!validateUser(userID, password)) return new HashMap<>();
     return InsurancePolicy.deepCopyHashMap(policies);
   }
   
@@ -391,8 +384,8 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   //   return Double.compare(calcTotalPayments(5), u.calcTotalPayments(5));
   // }
 
-  public ArrayList<InsurancePolicy> sortPoliciesByDate(String username, String password) throws CloneNotSupportedException {
-    if (!validateUser(username, password)) return new ArrayList<>();
+  public ArrayList<InsurancePolicy> sortPoliciesByDate(int userID, String password) throws CloneNotSupportedException {
+    if (!validateUser(userID, password)) return new ArrayList<>();
     ArrayList<InsurancePolicy> shallowCopyPolicies = InsurancePolicy.shallowCopy(policies);
     Collections.sort(shallowCopyPolicies);
     return shallowCopyPolicies;
@@ -447,7 +440,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   }
 
   public String toDelimitedString() {
-    String result = delimitedKey + "," + userID + "," + name + "," + username + "," + password + "," + address.toDelimitedString() + "," + policies.size();
+    String result = delimitedKey + "," + userID + "," + name + "," + password + "," + address.toDelimitedString() + "," + policies.size();
     for (InsurancePolicy policy : policies.values()) {
       result += "," + policy.toDelimitedString();
     }
@@ -499,7 +492,6 @@ public class User implements Cloneable, Comparable<User>, Serializable {
       startIndex++; // userDelimitedKey
       int userID = Integer.parseInt(fields[startIndex++]);
       String name = fields[startIndex++];
-      String username = fields[startIndex++];
       String password = fields[startIndex++];
       startIndex++; // addressDelimitedKey
       int streetNum = Integer.parseInt(fields[startIndex++]);
@@ -510,7 +502,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
 
       Address address = new Address(streetNum, street, suburb, city);
       HashMap<Integer, InsurancePolicy> policies = InsurancePolicy.extractPoliciesFromFields(numberOfPolicies, startIndex, fields);
-      User user = new User(name, username, password, address, policies, userID);
+      User user = new User(name, password, address, policies, userID);
       users.put(userID, user);
 
       // evaluate startIndex for next step
@@ -525,8 +517,8 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   // ASM2
   // proxy pattern
 
-  public void printPolicies(String username, String password) {
-    if (!validateUser(username, password)) return;
+  public void printPolicies(int userID, String password) {
+    if (!validateUser(userID, password)) return;
     InsurancePolicy.printPolicies(policies);
   }
 

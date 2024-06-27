@@ -31,13 +31,13 @@ public class UserInterface {
     );
     List<Runnable> actions = Arrays.asList(
       () -> {
-        if (login(true)) {
+        if (loginAdmin()) {
           adminMenu();
           activeMenu = 2;
         }
       },
       () -> {
-        if (login(false)) {
+        if (loginUser()) {
           userMenu();
           activeMenu = 3;
         }
@@ -49,17 +49,27 @@ public class UserInterface {
     }
   }
 
-  public boolean login(boolean isAdmin) {
+  public boolean loginAdmin() {
     System.out.print("Username: ");
     String username = inputReader.nextLine();
     System.out.print("Password: ");
     String password = inputReader.nextLine();
-    if (isAdmin && mainCompany.validateAdmin(username, password)) {
+    if (mainCompany.validateAdmin(username, password)) {
       System.out.println("Welcome dear Admin!");
       adminLoggedIn = true;
       return true;
-    } else if (mainCompany.validateUser(getAdminUsername(), getAdminPassword(), username, password)) {
-      account = mainCompany.findUser(getAdminUsername(), getAdminPassword(), username);
+    } else {
+      System.out.println("\nWrong username or password.\n");
+      return false;
+    }
+  }
+
+  public boolean loginUser() {
+    int userID = getRestrictedInt(0, null, "User ID: ");
+    System.out.print("Password: ");
+    String password = inputReader.nextLine();
+    account = mainCompany.validateUser(userID, password);
+    if (account != null) {
       System.out.println("Logged in as " + account.getName() + " successfully!");
       return true;
     } else {
@@ -136,16 +146,16 @@ public class UserInterface {
       Car testCar2 = new Car("Test Car 2", CarType.SED, 2500, 3100);
       ComprehensivePolicy testPolicy = new ComprehensivePolicy(InsuranceCompany.generateRandomPolicyId(), testCar, 1, "James Bond", new MyDate(2004, 6, 15), 29, 1);
       ComprehensivePolicy testPolicy2 = new ComprehensivePolicy(InsuranceCompany.generateRandomPolicyId(), testCar2, 2, "Foo Bar", new MyDate(2008, 5, 11), 29, 1);
-      User testUser = mainCompany.createUser(getAdminUsername(), getAdminPassword(), "Test Only", "test_only", "test", new Address(0, "Test", "t-test", "AAAA Testing"), null, null);
-      testUser.addPolicy("test_only", "test", testPolicy);
-      testUser.addPolicy("test_only", "test", testPolicy2);
+      User testUser = mainCompany.createUser(getAdminUsername(), getAdminPassword(), "Test Only", "test", new Address(0, "Test", "t-test", "AAAA Testing"), null, null);
+      testUser.addPolicy(testUser.getUserID(), testUser.getPassword(), testPolicy);
+      testUser.addPolicy(testUser.getUserID(), testUser.getPassword(), testPolicy2);
       // testing policies sort
-      HashMap<Integer, InsurancePolicy> shallowCopyPolicies = testUser.shallowCopyPoliciesHashMap("test_only", "test");
-      HashMap<Integer, InsurancePolicy> deepCopyPolicies = testUser.deepCopyPoliciesHashMap("test_only", "test");
+      HashMap<Integer, InsurancePolicy> shallowCopyPolicies = testUser.shallowCopyPoliciesHashMap(testUser.getUserID(), testUser.getPassword());
+      HashMap<Integer, InsurancePolicy> deepCopyPolicies = testUser.deepCopyPoliciesHashMap(testUser.getUserID(), testUser.getPassword());
       // change some fields in user
       Car testCar3 = new Car("Test Car 3", CarType.HATCH, 1000, 50000);
       ComprehensivePolicy testPolicy3 = new ComprehensivePolicy(InsuranceCompany.generateRandomPolicyId(), testCar3, 1000, "Test Policy", new MyDate(2999, 7, 12), 29, 1);
-      testUser.addPolicy("test_only", "test", testPolicy3);
+      testUser.addPolicy(testUser.getUserID(), testUser.getPassword(), testPolicy3);
       checkTestStatus(
         "policy " + testPolicy3.getId() + " should only exist in original list, not shallow nor deep copies.",
         testUser.getPolicies().get(testPolicy3.getId()) != null &&
@@ -153,7 +163,7 @@ public class UserInterface {
         deepCopyPolicies.get(testPolicy3.getId()) == null
       );
       // sort policies
-      ArrayList<InsurancePolicy> sortedPolicies = testUser.sortPoliciesByDate("test_only", "test");
+      ArrayList<InsurancePolicy> sortedPolicies = testUser.sortPoliciesByDate(testUser.getUserID(), testUser.getPassword());
       System.out.println("After Sorting Policies");
       printDivider();
       System.out.println("Sorted Policies:");
@@ -172,7 +182,7 @@ public class UserInterface {
       HashMap<Integer, User> shallowCopyUsers = mainCompany.shallowCopyUsersHashMap(getAdminUsername(), getAdminPassword());
       HashMap<Integer, User> deepCopyUsers = mainCompany.deepCopyUsersHashMap(getAdminUsername(), getAdminPassword());
       // add new user
-      User testUser2 = mainCompany.createUser(getAdminUsername(), getAdminPassword(), "Test Only 2", "test_only_2", "test", new Address(0, "Test 2", "t-test", "Testing"), null, null);
+      User testUser2 = mainCompany.createUser(getAdminUsername(), getAdminPassword(), "Test Only 2", "test 2", new Address(0, "Test 2", "t-test", "Testing"), null, null);
       checkTestStatus(
         "user " + testUser2.getUserID() + " should only exist in original list, not shallow nor deep copies.",
         mainCompany.getUsers().get(testUser2.getUserID()) != null &&
@@ -339,11 +349,6 @@ public class UserInterface {
     System.out.print("Enter user's name: ");
     String name = inputReader.nextLine();
     System.out.print("Enter a unique username: ");
-    String username = inputReader.nextLine();
-    while (mainCompany.findUser(getAdminUsername(), getAdminPassword(), username) != null) {
-      System.out.print("Username exists! Enter again: ");
-      username = inputReader.nextLine();
-    }
     System.out.print("Enter password: ");
     String password = inputReader.nextLine();
     Address address = getAddress();
@@ -351,7 +356,6 @@ public class UserInterface {
       getAdminUsername(),
       getAdminPassword(),
       name,
-      username,
       password,
       address,
       null,
@@ -368,7 +372,7 @@ public class UserInterface {
     Car car = createNewCar();
     if (userID == null) {
       System.out.print("Which user you want to create policy for? ");
-      userID = getUserID();
+      userID = getUserIDInput();
     }
     System.out.print("Enter your policy's holder name: ");
     String policyHolderName = inputReader.nextLine();
@@ -385,7 +389,7 @@ public class UserInterface {
     Car car = createNewCar();
     if (userID == null) {
       System.out.print("Which user you want to create policy for? ");
-      userID = getUserID();
+      userID = getUserIDInput();
     }
     System.out.print("Enter your policy's holder name: ");
     String policyHolderName = inputReader.nextLine();
@@ -429,7 +433,7 @@ public class UserInterface {
   public void filterByExpiryDate(Integer userID) {
     System.out.print("To filter policies of an specific user by expiry date, please ");
     if (userID == null) {
-      userID = getUserID();
+      userID = getUserIDInput();
     }
     MyDate expiryDate = getDate();
     HashMap<Integer, InsurancePolicy> expiredPolicies = mainCompany.filterByExpiryDate(getAdminUsername(), getAdminPassword(), userID, expiryDate);
@@ -440,16 +444,15 @@ public class UserInterface {
   public void updateAddress(Integer userID) {
     if (userID == null) {
       System.out.print("To update a user's address, ");
-      userID = getUserID();
+      userID = getUserIDInput();
     }
-    User validUser = mainCompany.findUser(getAdminUsername(), getAdminPassword(), userID);
     Address newAddress = getAddress();
-    validUser.setAddress(newAddress);
+    mainCompany.updateUserAddress(getAdminUsername(), getAdminPassword(), userID, newAddress);
     System.out.println();
   }
 
   public void userTotalPaymentPerCarModelAggregation() {
-    int userID = getUserID();
+    int userID = getUserIDInput();
     User targetUser = mainCompany.findUser(getAdminUsername(), getAdminPassword(), userID);
     totalPaymentPerCarModelAggregation(targetUser);
   }
@@ -467,16 +470,16 @@ public class UserInterface {
   public void removePolicy(Integer userID) {
     System.out.print("To remove a policy, please ");
     if (userID == null) {
-      userID = getUserID();
+      userID = getUserIDInput();
     }
     User targetUser = mainCompany.findUser(getAdminUsername(), getAdminPassword(), userID);
     int policyID = getPolicyID(targetUser);
-    InsurancePolicy policy = targetUser.findPolicy(getAdminUsername(), getAdminPassword(), policyID);
+    InsurancePolicy policy = targetUser.findPolicy(getAccountUsername(), getAccountPassword(), policyID);
     System.out.println("Removing policy (" + policy.getPolicyHolderName() + ") with ID " + policyID + " from (" + targetUser.getName() + ").");
     System.out.println("Confirm? (y/n) ");
     String input = inputReader.nextLine();
     if (input.equals("y")) {
-      if (targetUser.removePolicy(getAdminUsername(), getAdminPassword(), policy)) {
+      if (targetUser.removePolicy(getAccountUsername(), getAccountPassword(), policy)) {
         System.out.println("Removed Successfully.");
         return;
       }
@@ -486,7 +489,7 @@ public class UserInterface {
 
   public void removeUser() {
     System.out.print("To remove a user, please ");
-    int userID = getUserID();
+    int userID = getUserIDInput();
     User targetUser = mainCompany.findUser(getAdminUsername(), getAdminPassword(), userID);
     System.out.println("Removing user (" + targetUser.getName() + ") with ID " + userID + ".");
     System.out.println("Confirm? (y/n) ");
@@ -540,16 +543,12 @@ public class UserInterface {
 
   public void serializeCompany(String fileName) {
     System.out.println("Saving Company...");
-    try {
-      if (mainCompany.clone().save(getAdminUsername(), getAdminPassword(), fileName)) {
-        System.out.println("Successfully Saved!");
-      } else {
-        System.out.println("Failed Saving!");
-      }
-      System.out.println();
-    } catch (CloneNotSupportedException e) {
-      System.out.println("Not Supported!");
+    if (mainCompany.save(getAdminUsername(), getAdminPassword(), fileName)) {
+      System.out.println("Successfully Saved!");
+    } else {
+      System.out.println("Failed Saving!");
     }
+    System.out.println();
   }
 
   public void loadSerializedCompany(String fileName) {
@@ -642,7 +641,7 @@ public class UserInterface {
   public void printPolicy() {
     System.out.print("To view a policy details, ");
     int policyID = getPolicyID(account);
-    account.findPolicy(account.getUsername(), account.getPassword(), policyID).print();
+    account.findPolicy(getAccountUsername(), getAccountPassword(), policyID).print();
   }
 
   public void logoutUser() {
@@ -660,8 +659,8 @@ public class UserInterface {
     return adminLoggedIn ? mainCompany.getAdminPassword() : "";
   }
 
-  public String getAccountUsername() {
-    return account == null ? "" : account.getUsername();
+  public int getAccountUsername() {
+    return account == null ? -1 : account.getUserID();
   }
 
   public String getAccountPassword() {
@@ -686,7 +685,7 @@ public class UserInterface {
     inputReader.nextLine();
   }
 
-  public int getUserID() {
+  public int getUserIDInput() {
     int userID = 0;
     System.out.print("Enter userID: ");
     while (userID == 0) {
@@ -712,7 +711,7 @@ public class UserInterface {
       try {
         policyID = inputReader.nextInt();
         inputReader.nextLine();
-        if (user.findPolicy(getAdminUsername(), getAdminPassword(), policyID) == null) {
+        if (user.findPolicy(user.getUserID(), user.getPassword(), policyID) == null) {
           System.out.print("Policy not found. Try Again: ");
           policyID = -1;
         }
@@ -827,7 +826,7 @@ public class UserInterface {
   }
   
   public Car createNewCar() {
-    System.out.println("For Creating a New Car, enter following details.");
+    System.out.println("To Create a New Car, enter following details.");
     System.out.println("Enter car model: ");
     String carModel = inputReader.nextLine();
     CarType carType = getCarModel();

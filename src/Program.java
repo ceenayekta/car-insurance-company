@@ -172,9 +172,9 @@ public class Program {
     Car car6 = new Car("Lamborghini", CarType.HATCH, 2005, 5677);
     
     // migrate users
-    User user1 = new User("John Doe", "john_doe", "john1234", new Address(21, "Eastern", "J15r", "Manhattan"), null, null);
-    User user2 = new User("Foo Bar", "foo_bar", "foo1234", new Address(13, "Golden State", "P21W", "New York"), null, null);
-    User user3 = new User("James Bond", "james_bond", "james1234", new Address(15, "Southern", "4DS2", "Toronto"), null, null);
+    User user1 = new User("John Doe", "john1234", new Address(21, "Eastern", "J15r", "Manhattan"), null, null);
+    User user2 = new User("Foo Bar", "foo1234", new Address(13, "Golden State", "P21W", "New York"), null, null);
+    User user3 = new User("James Bond", "james1234", new Address(15, "Southern", "4DS2", "Toronto"), null, null);
     try {
       // migrate policies
       ComprehensivePolicy compPolicy1 = new ComprehensivePolicy(InsurancePolicy.generateRandomId(), car1, 1, "Simple Policy 1", new MyDate(2024, 6, 19), 24, 1);
@@ -183,12 +183,12 @@ public class Program {
       ThirdPartyPolicy thirdPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car4, 1, "Industrial Insurance 1", new MyDate(2024, 6, 19), "1 year full warranty.");
       ThirdPartyPolicy thirdPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car5, 4, "Industrial Insurance 2", new MyDate(2024, 6, 20), "2 year full warranty.");
       ThirdPartyPolicy thirdPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car6, 2, "Industrial Insurance 3", new MyDate(2024, 6, 21), "3 year full warranty.");
-      user1.addPolicy("john_doe", "john1234", compPolicy1);
-      user1.addPolicy("john_doe", "john1234", thirdPolicy1);
-      user2.addPolicy("foo_bar", "foo1234", compPolicy2);
-      user2.addPolicy("foo_bar", "foo1234", thirdPolicy2);
-      user3.addPolicy("james_bond", "james1234", compPolicy3);
-      user3.addPolicy("james_bond", "james1234", thirdPolicy3);
+      user1.addPolicy(user1.getUserID(), "john1234", compPolicy1);
+      user1.addPolicy(user1.getUserID(), "john1234", thirdPolicy1);
+      user2.addPolicy(user2.getUserID(), "foo1234", compPolicy2);
+      user2.addPolicy(user2.getUserID(), "foo1234", thirdPolicy2);
+      user3.addPolicy(user3.getUserID(), "james1234", compPolicy3);
+      user3.addPolicy(user3.getUserID(), "james1234", thirdPolicy3);
     } catch (PolicyException e) {
       System.out.println(e);
     } catch (PolicyHolderNameException e) {
