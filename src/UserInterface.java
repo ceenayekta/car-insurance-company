@@ -348,7 +348,6 @@ public class UserInterface {
   public void createUser() {
     System.out.print("Enter user's name: ");
     String name = inputReader.nextLine();
-    System.out.print("Enter a unique username: ");
     System.out.print("Enter password: ");
     String password = inputReader.nextLine();
     Address address = getAddress();
@@ -436,7 +435,9 @@ public class UserInterface {
       userID = getUserIDInput();
     }
     MyDate expiryDate = getDate();
-    HashMap<Integer, InsurancePolicy> expiredPolicies = mainCompany.filterByExpiryDate(getAdminUsername(), getAdminPassword(), userID, expiryDate);
+    HashMap<Integer, InsurancePolicy> expiredPolicies = adminLoggedIn ?
+      mainCompany.filterByExpiryDate(getAdminUsername(), getAdminPassword(), userID, expiryDate) :
+      mainCompany.filterByExpiryDate(userID, getAccountPassword(), expiryDate);
     InsuranceCompany.printPolicies(expiredPolicies);
     System.out.println();
   }
@@ -447,8 +448,15 @@ public class UserInterface {
       userID = getUserIDInput();
     }
     Address newAddress = getAddress();
-    mainCompany.updateUserAddress(getAdminUsername(), getAdminPassword(), userID, newAddress);
-    System.out.println();
+    if (
+      adminLoggedIn ?
+      mainCompany.updateUserAddress(getAdminUsername(), getAdminPassword(), userID, newAddress) :
+      mainCompany.updateUserAddress(userID, getAccountPassword(), newAddress)
+    ) {
+      System.out.println("Address Updated.");
+    } else {
+      System.out.println("Updating Address Failed!.");
+    }
   }
 
   public void userTotalPaymentPerCarModelAggregation() {
@@ -469,17 +477,24 @@ public class UserInterface {
 
   public void removePolicy(Integer userID) {
     System.out.print("To remove a policy, please ");
-    if (userID == null) {
+    User targetUser = account;
+    if (adminLoggedIn) {
       userID = getUserIDInput();
+      targetUser = mainCompany.findUser(getAdminUsername(), getAdminPassword(), userID);
     }
-    User targetUser = mainCompany.findUser(getAdminUsername(), getAdminPassword(), userID);
-    int policyID = getPolicyID(targetUser);
-    InsurancePolicy policy = targetUser.findPolicy(getAccountUsername(), getAccountPassword(), policyID);
+    int policyID = getPolicyID(userID);
+    InsurancePolicy policy = adminLoggedIn ?
+      mainCompany.findPolicy(getAdminUsername(), getAdminPassword(), userID, policyID):
+      mainCompany.findPolicy(getAccountID(), getAccountPassword(), policyID);
     System.out.println("Removing policy (" + policy.getPolicyHolderName() + ") with ID " + policyID + " from (" + targetUser.getName() + ").");
     System.out.println("Confirm? (y/n) ");
     String input = inputReader.nextLine();
     if (input.equals("y")) {
-      if (targetUser.removePolicy(getAccountUsername(), getAccountPassword(), policy)) {
+      if (
+        adminLoggedIn ?
+        mainCompany.removePolicy(getAdminUsername(), getAdminPassword(), userID, policy) :
+        mainCompany.removePolicy(getAccountID(), getAccountPassword(), policy)
+      ) {
         System.out.println("Removed Successfully.");
         return;
       }
@@ -511,7 +526,7 @@ public class UserInterface {
     System.out.print("Confirm Password: ");
     String confirmPassword = inputReader.nextLine();
     if (confirmPassword.equals(newPassword)) {
-      if (mainCompany.updateAdminPassword(newPassword, currentPassword, newPassword)) {
+      if (mainCompany.updateAdminPassword(currentPassword, newPassword)) {
         System.out.println("Password has been updated.");
       } else {
         System.out.println("Current password is incorrect.");
@@ -566,7 +581,7 @@ public class UserInterface {
     // ArrayList<Integer> counts = new ArrayList<>();
     // ArrayList<Double> payments = new ArrayList<>();
     System.out.println("Total payment per car model: ");
-    if (user == null) {
+    if (adminLoggedIn) {
       // carModels = mainCompany.populateDistinctCarModels();
       // counts = mainCompany.getTotalCountPerCarModel(carModels);
       // payments = mainCompany.getTotalPaymentPerCarModel(carModels);
@@ -579,8 +594,8 @@ public class UserInterface {
       // counts = user.getTotalCountPerCarModel(carModels);
       // payments = user.getTotalPaymentPerCarModel(carModels, mainCompany.getFlatRate());
       InsuranceCompany.reportPaymentsPerCarModel(
-        user.getTotalCountForCarModel(getAccountUsername(), getAccountPassword()),
-        user.getTotalPaymentForCarModel(getAccountUsername(), getAccountPassword(), mainCompany.getFlatRate())
+        mainCompany.getTotalCountPerCarModel(getAccountID(), getAccountPassword()),
+        mainCompany.getTotalPaymentForCarModel(getAccountID(), getAccountPassword())
       );
     }
     // InsuranceCompany.reportPaymentsPerCarModel(carModels, counts, payments);
@@ -624,12 +639,12 @@ public class UserInterface {
       "8. Exit"
     );
     List<Runnable> actions = Arrays.asList(
-      () -> createThirdPartyPolicy(account.getUserID()),
-      () -> createComprehensivePolicy(account.getUserID()),
-      () -> updateAddress(account.getUserID()),
-      () -> removePolicy(account.getUserID()),
+      () -> createThirdPartyPolicy(getAccountID()),
+      () -> createComprehensivePolicy(getAccountID()),
+      () -> updateAddress(getAccountID()),
+      () -> removePolicy(getAccountID()),
       () -> printPolicy(),
-      () -> filterByExpiryDate(account.getUserID()),
+      () -> filterByExpiryDate(getAccountID()),
       () -> totalPaymentPerCarModelAggregation(account),
       () -> logoutUser()
     );
@@ -640,8 +655,8 @@ public class UserInterface {
   
   public void printPolicy() {
     System.out.print("To view a policy details, ");
-    int policyID = getPolicyID(account);
-    account.findPolicy(getAccountUsername(), getAccountPassword(), policyID).print();
+    int policyID = getPolicyID(getAccountID());
+    mainCompany.findPolicy(getAccountID(), getAccountPassword(), policyID).print();
   }
 
   public void logoutUser() {
@@ -659,7 +674,7 @@ public class UserInterface {
     return adminLoggedIn ? mainCompany.getAdminPassword() : "";
   }
 
-  public int getAccountUsername() {
+  public int getAccountID() {
     return account == null ? -1 : account.getUserID();
   }
 
@@ -704,14 +719,17 @@ public class UserInterface {
     return userID;
   }
 
-  public int getPolicyID(User user) {
+  public int getPolicyID(int userID) {
     int policyID = -1;
     System.out.print("Enter policyID: ");
     while (policyID == -1) {
       try {
         policyID = inputReader.nextInt();
         inputReader.nextLine();
-        if (user.findPolicy(user.getUserID(), user.getPassword(), policyID) == null) {
+        InsurancePolicy foundPolicy = adminLoggedIn ?
+          mainCompany.findPolicy(getAdminUsername(), getAdminPassword(), userID, policyID) :
+          mainCompany.findPolicy(getAccountID(), getAccountPassword(), policyID);
+        if (foundPolicy == null) {
           System.out.print("Policy not found. Try Again: ");
           policyID = -1;
         }
@@ -766,7 +784,11 @@ public class UserInterface {
 
   public void createThirdPartyPolicyInCompany(int userID, String policyHolderName, int policyId, Car car, int numberOfClaims, MyDate expiryDate, String comments) {
     try {
-      if (mainCompany.createThirdPartyPolicy(getAdminUsername(), getAdminPassword(), userID, policyHolderName, policyId, car, numberOfClaims, expiryDate, comments)) {
+      if (
+        adminLoggedIn ?
+        mainCompany.createThirdPartyPolicy(getAdminUsername(), getAdminPassword(), userID, policyHolderName, policyId, car, numberOfClaims, expiryDate, comments) :
+        mainCompany.createThirdPartyPolicy(getAccountID(), getAccountPassword(), policyHolderName, policyId, car, numberOfClaims, expiryDate, comments)
+      ) {
         System.out.println("Policy '" + policyHolderName + "' added.");
       } else {
         if (mainCompany.findUser(getAdminUsername(), getAdminPassword(), userID) == null) {
@@ -784,7 +806,11 @@ public class UserInterface {
   
   public void createComprehensivePolicyInCompany(int userID, String policyHolderName, int policyId, Car car, int numberOfClaims, MyDate expiryDate, int driverAge, int level) {
     try {
-      if (mainCompany.createComprehensivePolicy(getAdminUsername(), getAdminPassword(), userID, policyHolderName, policyId, car, numberOfClaims, expiryDate, driverAge, level)) {
+      if (
+        adminLoggedIn ?
+        mainCompany.createComprehensivePolicy(getAdminUsername(), getAdminPassword(), userID, policyHolderName, policyId, car, numberOfClaims, expiryDate, driverAge, level) :
+        mainCompany.createComprehensivePolicy(getAccountID(), getAccountPassword(), policyHolderName, policyId, car, numberOfClaims, expiryDate, driverAge, level)
+      ) {
         System.out.println("Policy '" + policyHolderName + "' added.");
       } else {
         if (mainCompany.findUser(getAdminUsername(), getAdminPassword(), userID) == null) {
@@ -800,8 +826,8 @@ public class UserInterface {
     }
   }
 
-  public CarType getCarModel() {
-    System.out.println("Enter car model (" + CarType.values() + "): ");
+  public CarType getCarType() {
+    System.out.println("Enter car model (" + Arrays.toString(CarType.values()) + "): ");
     while (true) {
       try {
         String input = inputReader.nextLine();
@@ -829,7 +855,7 @@ public class UserInterface {
     System.out.println("To Create a New Car, enter following details.");
     System.out.println("Enter car model: ");
     String carModel = inputReader.nextLine();
-    CarType carType = getCarModel();
+    CarType carType = getCarType();
     int year = getRestrictedInt(1800, 2024, "Enter manufacturing year ");
     int price = getRestrictedInt(0, null, "Enter car price ");
     Car car = InsuranceCompany.createCar(carModel, carType, year, price);

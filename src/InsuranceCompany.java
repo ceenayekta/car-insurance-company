@@ -150,24 +150,39 @@ public class InsuranceCompany implements Cloneable, Serializable {
     return null;
   }
 
-  public void updateUserAddress(String adminUsername, String adminPassword, int userID, Address address) {
-    if (!validateAdmin(adminUsername, adminPassword)) return;
+  public boolean removePolicy(String adminUsername, String adminPassword, int userID, InsurancePolicy policy) {
     User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return false;
+    return user.removePolicy(userID, user.getPassword(), policy);
+  }
+
+  public boolean updateUserAddress(String adminUsername, String adminPassword, int userID, Address address) {
+    if (!validateAdmin(adminUsername, adminPassword)) return false;
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return false;
+    return updateUserAddress(userID, user.getPassword(), address);
+  }
+
+  public boolean updateUserAddress(int userID, String password, Address address) {
+    if (!validateAdmin(adminUsername, adminPassword)) return false;
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return false;
     user.setAddress(address);
+    return true;
   }
 
   public boolean createThirdPartyPolicy(String adminUsername, String adminPassword, int userID, String policyHolderName, int policyId, Car car, int numberOfClaims, MyDate expiryDate, String comments) throws PolicyException, PolicyHolderNameException {
     if (!validateAdmin(adminUsername, adminPassword)) return false;
     User user = findUser(adminUsername, adminPassword, userID);
     if (user == null) return false;
-    return user.createThirdPartyPolicy(user.getUserID(), user.getPassword(), policyHolderName, policyId, car, numberOfClaims, expiryDate, comments);
+    return user.createThirdPartyPolicy(userID, user.getPassword(), policyHolderName, policyId, car, numberOfClaims, expiryDate, comments);
   }
 
   public boolean createComprehensivePolicy(String adminUsername, String adminPassword, int userID, String policyHolderName, int policyId, Car car, int numberOfClaims, MyDate expiryDate, int driverAge, int level) throws PolicyException, PolicyHolderNameException {
     if (!validateAdmin(adminUsername, adminPassword)) return false;
     User user = findUser(adminUsername, adminPassword, userID);
     if (user == null) return false;
-    return user.createComprehensivePolicy(user.getUserID(), user.getPassword(), policyHolderName, policyId, car, numberOfClaims, expiryDate, driverAge, level);
+    return user.createComprehensivePolicy(userID, user.getPassword(), policyHolderName, policyId, car, numberOfClaims, expiryDate, driverAge, level);
   }
 
   public double calcTotalPayments(String adminUsername, String adminPassword, int userID) {
@@ -312,8 +327,8 @@ public class InsuranceCompany implements Cloneable, Serializable {
     }
   }
 
-  public boolean updateAdminPassword(String adminUsername, String adminPassword, String newPassword) {
-    if (validateAdmin(adminUsername, adminPassword)) {
+  public boolean updateAdminPassword(String currentPassword, String newPassword) {
+    if (validateAdmin(adminUsername, currentPassword)) {
       adminPassword = newPassword;
       return true;
     }
@@ -339,7 +354,7 @@ public class InsuranceCompany implements Cloneable, Serializable {
     for (String carModel : populateDistinctCarModels(adminUsername, adminPassword)) {
       int carModelCount = 0;
       for (User user : users.values()) {
-        carModelCount += user.getTotalCountForCarModel(user.getUserID(), user.getPassword(), carModel);
+        carModelCount += user.getTotalCountPerCarModel(user.getUserID(), user.getPassword(), carModel);
       }
       carModelCounts.add(carModelCount);
     }
@@ -384,7 +399,7 @@ public class InsuranceCompany implements Cloneable, Serializable {
     HashMap<String, Integer> counts = new HashMap<String, Integer>();
     if (!validateAdmin(adminUsername, adminPassword)) return counts;
     for (User user : users.values()) {
-      HashMap<String, Integer> userCarModelCounts = user.getTotalCountForCarModel(user.getUserID(), user.getPassword());
+      HashMap<String, Integer> userCarModelCounts = user.getTotalCountPerCarModel(user.getUserID(), user.getPassword());
       for (String carModel : userCarModelCounts.keySet()) {
         Integer count = counts.get(carModel);
         Integer counted = userCarModelCounts.get(carModel);
@@ -661,6 +676,138 @@ public class InsuranceCompany implements Cloneable, Serializable {
     User foundUser = findUser(adminUsername, adminPassword, userID);
     if (foundUser == null || !foundUser.validateUser(userID, password)) return null;
     return foundUser;
+  }
+
+  public void printPolicies(int userID, String password) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return;
+    user.printPolicies(userID, password, flatRate);
+  }
+
+  public boolean addPolicy(int userID, String password, InsurancePolicy policy) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return false;
+    return user.addPolicy(userID, password, policy);
+  }
+
+  public boolean removePolicy(int userID, String password, InsurancePolicy policy) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return false;
+    return user.removePolicy(userID, password, policy);
+  }
+
+  public InsurancePolicy findPolicy(int userID, String password, int policyId) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return null;
+    return user.findPolicy(userID, password, policyId);
+  }
+
+  public double calcTotalPayments(int userID, String password) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return 0;
+    return user.calcTotalPayments(userID, password, flatRate);
+  }
+
+  public void carRisePriceAll(int userID, String password, double risePercent) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return;
+    user.carRisePriceAll(userID, password, risePercent);
+  }
+
+  public HashMap<Integer, InsurancePolicy> filterByCarModel(int userID, String password, String carModel) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new HashMap<>();
+    return user.filterByCarModel(userID, password, carModel);
+  }
+
+  public HashMap<Integer, InsurancePolicy> filterByExpiryDate(int userID, String password, MyDate date) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new HashMap<>();
+    return user.filterByExpiryDate(userID, password, date);
+  }
+
+  public boolean createThirdPartyPolicy(int userID, String password, String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, String comments) throws PolicyException, PolicyHolderNameException {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return false;
+    return user.createThirdPartyPolicy(userID, password, policyHolderName, id, car, numberOfClaims, expiryDate, comments) ;
+  }
+
+  public boolean createComprehensivePolicy(int userID, String password, String policyHolderName, int id, Car car, int numberOfClaims, MyDate expiryDate, int driverAge, int level) throws PolicyException, PolicyHolderNameException {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return false;
+    return user.createComprehensivePolicy(userID, password, policyHolderName, id, car, numberOfClaims, expiryDate, driverAge, level) ;
+  }
+
+  public ArrayList<String> populateDistinctCarModels(int userID, String password) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new ArrayList<>();
+    return user.populateDistinctCarModels(userID, password);
+  }
+
+  public int getTotalCountPerCarModel(int userID, String password, String carModel) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return 0;
+    return user.getTotalCountPerCarModel(userID, password, carModel);
+  }
+
+  public HashMap<String, Integer> getTotalCountPerCarModel(int userID, String password) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new HashMap<>();
+    return user.getTotalCountPerCarModel(userID, password);
+  }
+
+  public double getTotalPaymentForCarModel(int userID, String password, String carModel) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return 0;
+    return user.getTotalPaymentForCarModel(userID, password, carModel, flatRate);
+  }
+
+  public HashMap<String, Double> getTotalPaymentForCarModel(int userID, String password) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new HashMap<>();
+    return user.getTotalPaymentForCarModel(userID, password, flatRate);
+  }
+
+  public ArrayList<Integer> getTotalCountPerCarModel(int userID, String password, ArrayList<String> carModels) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new ArrayList<>();
+    return user.getTotalCountPerCarModel(userID, password, carModels);
+  }
+
+  public ArrayList<Double> getTotalPaymentPerCarModel(int userID, String password, ArrayList<String> carModels) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new ArrayList<>();
+    return user.getTotalPaymentPerCarModel(userID, password, carModels, flatRate);
+  }
+
+  public ArrayList<InsurancePolicy> shallowCopyPolicies(int userID, String password) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new ArrayList<>();
+    return user.shallowCopyPolicies(userID, password);
+  }
+
+  public HashMap<Integer, InsurancePolicy> shallowCopyPoliciesHashMap(int userID, String password) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new HashMap<>();
+    return user.shallowCopyPoliciesHashMap(userID, password);
+  }
+
+  public ArrayList<InsurancePolicy> deepCopyPolicies(int userID, String password) throws CloneNotSupportedException {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new ArrayList<>();
+    return user.deepCopyPolicies(userID, password);
+  }
+
+  public HashMap<Integer, InsurancePolicy> deepCopyPoliciesHashMap(int userID, String password) throws CloneNotSupportedException {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new HashMap<>();
+    return user.deepCopyPoliciesHashMap(userID, password);
+  }
+
+  public ArrayList<InsurancePolicy> sortPoliciesByDate(int userID, String password) throws CloneNotSupportedException {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new ArrayList<>();
+    return user.sortPoliciesByDate(userID, password);
   }
 
   public void printUsers(String adminUsername, String adminPassword) {

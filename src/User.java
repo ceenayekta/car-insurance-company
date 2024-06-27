@@ -214,7 +214,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return result;
   }
   
-  public int getTotalCountForCarModel(int userID, String password, String carModel) {
+  public int getTotalCountPerCarModel(int userID, String password, String carModel) {
     int count = 0;
     if (!validateUser(userID, password)) return count;
     for (InsurancePolicy policy : policies.values()) {
@@ -226,7 +226,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   }
   
   //lab5
-  public HashMap<String, Integer> getTotalCountForCarModel(int userID, String password) {
+  public HashMap<String, Integer> getTotalCountPerCarModel(int userID, String password) {
     HashMap<String, Integer> counts = new HashMap<String, Integer>();
     if (!validateUser(userID, password)) return counts;
     for (InsurancePolicy policy : policies.values()) {
@@ -260,7 +260,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     ArrayList<Integer> carModelCounts = new ArrayList<>();
     if (!validateUser(userID, password)) return carModelCounts;
     for (String carModel : populateDistinctCarModels(userID, password)) {
-      carModelCounts.add(getTotalCountForCarModel(userID, password, carModel));
+      carModelCounts.add(getTotalCountPerCarModel(userID, password, carModel));
     }
     return carModelCounts;
   }
