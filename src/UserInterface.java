@@ -237,17 +237,18 @@ public class UserInterface {
       // lab6
       // policy serialization
       System.out.println("TESTING BINARY SERIALIZATION");
-      String serFileNamePolicies = "policiesTest.ser";
+      String serFileNamePolicies = "policies.ser";
+      HashMap<Integer, InsurancePolicy> policiesToSave = mainCompany.allPolicies(getAdminUsername(), getAdminPassword());
       System.out.println("List of Policies:");
-      InsuranceCompany.printPolicies(testUser.getPolicies());
+      InsuranceCompany.printPolicies(policiesToSave);
       System.out.println("Saving Policies...");
-      boolean isTestUserPoliciesSerialized = InsuranceCompany.savePolicies(testUser.getPolicies(), serFileNamePolicies);
+      boolean isTestUserPoliciesSerialized = InsuranceCompany.savePolicies(policiesToSave, serFileNamePolicies);
       System.out.println("List of Saved Policies:");
-      HashMap<Integer, InsurancePolicy> savedPolicies = InsuranceCompany.loadPolicies(serFileNamePolicies);
-      InsuranceCompany.printPolicies(savedPolicies);
-      checkTestStatus("policies of user " + testUser.getUserID() + " should be serialized.", isTestUserPoliciesSerialized && savedPolicies.size() > 0);
+      HashMap<Integer, InsurancePolicy> loadedPolicies = InsuranceCompany.loadPolicies(serFileNamePolicies);
+      InsuranceCompany.printPolicies(loadedPolicies);
+      checkTestStatus("policies of user " + testUser.getUserID() + " should be serialized.", isTestUserPoliciesSerialized && loadedPolicies.size() > 0);
       // user serialization
-      String serFileNameUsers = "usersTest.ser";
+      String serFileNameUsers = "users.ser";
       System.out.println("List of Users:");
       mainCompany.printUsers(getAdminUsername(), getAdminPassword());
       System.out.println("Saving Users...");
@@ -257,7 +258,7 @@ public class UserInterface {
       InsuranceCompany.printUsers(savedUsers);
       checkTestStatus("Company's users should be serialized.", isUsersSerialized && savedUsers.size() > 0);
       // company serialization
-      String serFileNameCompany = "companyTest.ser";
+      String serFileNameCompany = "company.ser";
       System.out.println("Main Company Details:");
       mainCompany.print();
       System.out.println("Saving Main Company...");
@@ -339,6 +340,76 @@ public class UserInterface {
       checkTestStatus("PolicyHolderNameException should be thrown for name 'simpleText'.", true);
     } catch (PolicyException e) {
     }
+
+    // filling_test.java codes is commented cause it's duplicating above test cases.
+    //-----------------------------------------------------------------------------------
+    //testing the save and load policies in/from BINARY FILE
+    // try {
+    //   InsurancePolicy.save(mainCompany.allPolicies(getAdminUsername(), getAdminPassword()),"policies.ser");
+    //   HashMap<Integer,InsurancePolicy> policies=InsurancePolicy.load("policies.ser");
+    //   System.out.println("Printing a list of policies loaded from binary file");
+    //   InsurancePolicy.printPolicies(policies);
+    // } catch (Exception e) {
+    //   System.err.println(e);
+    // }
+    // printDivider();
+    // //-----------------------------------------------------------------------------------
+    // //testing the save and load policies in/from TEXT FILE
+    // try {
+    //   InsurancePolicy.saveTextFile(mainCompany.allPolicies(getAdminUsername(), getAdminPassword()),"policies.txt");
+    //   HashMap<Integer,InsurancePolicy> policies=InsurancePolicy.loadTextFile("policies.txt");
+    //   System.out.println("Printing a list of policies loaded from Text file");
+    //   InsurancePolicy.printPolicies(policies);
+    // } catch (Exception e) {
+    //   System.err.println(e);
+    // }
+    // printDivider();
+    // //-----------------------------------------------------------------------------------
+    // //testing the save and load users in/from BINARY FILE
+    // try {
+    //   User.save(mainCompany.getUsers(),"users.ser");
+    //   HashMap<Integer,User> users=User.load("users.ser");
+    //   System.out.println("Printing a list of users loaded from binary file");
+    //   System.out.println(users.values());
+    // } catch (Exception e) {
+    //   System.err.println(e);
+    // }
+    // printDivider();
+    // //-----------------------------------------------------------------------------------
+    // //testing the save and load users in/from TEXT FILE
+    // try {
+    //   User.saveTextFile(mainCompany.getUsers(),"users.txt");
+    //   HashMap<Integer,User> users=User.loadTextFile("users.txt");
+    //   System.out.println("Printing a list of users loaded from Text file");
+    //   System.out.println(users.values());
+    // } catch (Exception e) {
+    //   System.err.println(e);
+    // }
+    // printDivider();
+    // //-----------------------------------------------------------------------------------
+    // //testing the save and load InsuranceCompany in/from BINARY FILE
+    // try {
+    //   mainCompany.save(getAdminUsername(), getAdminPassword(), "company.ser");
+    //   InsuranceCompany insuranceCompany2=new InsuranceCompany(); // use default constructor
+    //   insuranceCompany2.load(getAdminUsername(), getAdminPassword(), "company.ser");
+    //   System.out.println("Printing the insurance company loaded from binary file");
+    //   System.out.println(insuranceCompany2);
+    // } catch (Exception e) {
+    //   System.err.println(e);
+    // }
+    // printDivider();
+    // //-----------------------------------------------------------------------------------
+    // //testing the save and load InsuranceCompany in/from Text FILE
+    // try {
+    //   mainCompany.saveTextFile(getAdminUsername(), getAdminPassword(), "company.txt");
+    //   InsuranceCompany insuranceCompany2=new InsuranceCompany();
+    //   insuranceCompany2.loadTextFile(getAdminUsername(), getAdminPassword(), "company.txt");
+    //   System.out.println("Printing the isnurance company loaded from text file");
+    //   System.out.println(insuranceCompany2);
+    // } catch (Exception e) {
+    //   System.err.println(e);
+    // }
+    // printDivider();
 
     System.out.println("Overall Result (" + (passedCount + failedCount) +"): " + GREEN + passedCount + "passed , " + RED + failedCount + "failed" + DEFAULT);
     passedCount = 0;
