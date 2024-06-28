@@ -141,6 +141,64 @@ public class UserInterface {
   public void testCode() {
     //lab5
     try {
+      // ASM2 advanced methods test
+      int[] ranges = { 200, 500, 1000, 10000 };
+      System.out.println("Advanced Level - Assignment 2 (for range of " + Arrays.toString(ranges) + ")");
+      int storeFlatRate = mainCompany.getFlatRate();
+      mainCompany.setFlatRate(0);
+      printDivider();
+
+      System.out.println("Each User's Policy count:");
+      for (User user : mainCompany.getUsers().values()) {
+        int[] policyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, 0);
+        System.out.println(user.getName() + ": " + Arrays.toString(policyCount));
+      }
+      printDivider();
+
+      System.out.println("Company User's Policy Count:");
+      int[] policyCount = mainCompany.policyCount(getAdminUsername(), getAdminPassword(), ranges);
+      System.out.println(Arrays.toString(policyCount));
+      printDivider();
+
+      System.out.println("Company User's Policy Count per City:");
+      HashMap<String, Integer[]> policyCityCount = mainCompany.policyCityCount(getAdminUsername(), getAdminPassword(), ranges);
+      for (String city : policyCityCount.keySet()) {
+        System.out.println(city + " => " + Arrays.toString(policyCityCount.get(city)));
+      }
+      printDivider();
+
+      System.out.println("Company User Count:");
+      int[] userCount = mainCompany.userCount(getAdminUsername(), getAdminPassword(), ranges);
+      System.out.println(Arrays.toString(userCount));
+      printDivider();
+
+      System.out.println("Company User Count per CarModel:");
+      HashMap<String, Integer[]> userCarModelCount = mainCompany.userCarModelCount(getAdminUsername(), getAdminPassword(), ranges);
+      for (String carModel : userCarModelCount.keySet()) {
+        System.out.println(carModel + " => " + Arrays.toString(userCarModelCount.get(carModel)));
+      }
+      printDivider();
+
+      System.out.println("Each User's Policy Count per Car Model:");
+      for (User user : mainCompany.getUsers().values()) {
+        HashMap<String, Integer[]> userPolicyCarModelCount = user.policyCarModelCount(user.getUserID(), user.getPassword(), ranges, 0);
+        ArrayList<String> report = new ArrayList<>();
+        for (String carModel : userPolicyCarModelCount.keySet()) {
+          report.add(carModel + " => " + Arrays.toString(userPolicyCarModelCount.get(carModel)));
+        }
+        System.out.println(user.getName() + ": " + Arrays.toString(report.toArray()));
+      }
+      printDivider();
+
+      System.out.println("Company User's Policy Count per CarModel:");
+      HashMap<String, Integer[]> policyCarModelCount = mainCompany.policyCarModelCount(getAdminUsername(), getAdminPassword(), ranges);
+      for (String carModel : policyCarModelCount.keySet()) {
+        System.out.println(carModel + " => " + Arrays.toString(policyCarModelCount.get(carModel)));
+      }
+      printDivider();
+      
+      mainCompany.setFlatRate(storeFlatRate);
+
       // test fills
       Car testCar = new Car("Test Car", CarType.LUX, 2000, 3000);
       Car testCar2 = new Car("Test Car 2", CarType.SED, 2500, 3100);
@@ -301,6 +359,8 @@ public class UserInterface {
       clonedCompany2.loadTextFile(getAdminUsername(), getAdminPassword(), fileNameCompany);
       clonedCompany2.print();
       checkTestStatus("A clone of company should be saved in a file.", isMainCompanyTextFileSaved && mainCompany.getName().equals(clonedCompany2.getName()));
+      //
+
     } catch (CloneNotSupportedException e) {
       System.out.println("Cloning not supported! Initial tests Skipped.");
     } catch (PolicyException e) {
@@ -772,15 +832,15 @@ public class UserInterface {
   }
 
   public int getUserIDInput() {
-    int userID = 0;
+    int userID = -1;
     System.out.print("Enter userID: ");
-    while (userID == 0) {
+    while (userID == -1) {
       try {
         userID = inputReader.nextInt();
         inputReader.nextLine();
         if (mainCompany.findUser(getAdminUsername(), getAdminPassword(), userID) == null) {
           System.out.print("User not found. Try Again: ");
-          userID = 0;
+          userID = -1;
         }
       } catch (Exception e) {
         System.out.print("Wrong input. Try again: ");

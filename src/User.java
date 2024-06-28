@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -389,6 +390,46 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     ArrayList<InsurancePolicy> shallowCopyPolicies = InsurancePolicy.shallowCopy(policies);
     Collections.sort(shallowCopyPolicies);
     return shallowCopyPolicies;
+  }
+
+  // ASM2
+  private int getPaymentRangeIndex(double payment, int[] ranges) {
+    for (int i = 0; i < ranges.length; i++) {
+      if (payment <= ranges[i]) {
+        return i;
+      }
+    }
+    return 0;
+  }
+
+  public int[] policyCount(int userID, String password, int[] ranges, double flatRate) {
+    int[] count = new int[ranges.length];
+    Arrays.fill(count, 0);
+    if (!validateUser(userID, password)) return count;
+    for (InsurancePolicy policy : policies.values()) {
+      double payment = policy.calcPayment(flatRate);
+      int index = getPaymentRangeIndex(payment, ranges);
+      count[index] += 1;
+    }
+    return count;
+  }
+
+  public HashMap<String, Integer[]> policyCarModelCount(int userID, String password, int[] ranges, double flatRate) {
+    HashMap<String, Integer[]> count = new HashMap<>();
+    if (!validateUser(userID, password)) return count;
+    for (InsurancePolicy policy : policies.values()) {
+      String carModel = policy.getCar().getModel();
+      Integer[] currentCount = count.get(carModel);
+      if (currentCount == null) {
+        currentCount = new Integer[ranges.length];
+        Arrays.fill(currentCount, 0);
+      }
+      double payment = policy.calcPayment(flatRate);
+      int index = getPaymentRangeIndex(payment, ranges);
+      currentCount[index] += 1;
+      count.put(carModel, currentCount);
+    }
+    return count;
   }
 
   //lab6

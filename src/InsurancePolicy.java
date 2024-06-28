@@ -87,7 +87,7 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
   }
 
   public String toString() {
-    return "ID: " + id + " Car: {" + car + "} NumberOfClaims: " + numberOfClaims + " PolicyHolderName: " + policyHolderName + " ExpiryDate: " + expiryDate;
+    return "ID: " + id + " Car: {" + car + "} NumberOfClaims: " + numberOfClaims + " PolicyHolderName: " + policyHolderName + " PolicyHolderName: " + policyHolderName + " ExpiryDate: " + expiryDate;
   }
 
   abstract double calcPayment(double flatRate);

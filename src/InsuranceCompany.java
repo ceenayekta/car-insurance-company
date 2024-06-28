@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -120,7 +121,7 @@ public class InsuranceCompany implements Cloneable, Serializable {
   public void printPolicies(String adminUsername, String adminPassword, int userID) {
     if (!validateAdmin(adminUsername, adminPassword)) return;
     User user = findUser(adminUsername, adminPassword, userID);
-    if (user == null) System.out.println("User not found!");
+    if (user == null) return;
     else user.printPolicies(user.getUserID(), user.getPassword(), flatRate);
   }
 
@@ -568,6 +569,97 @@ public class InsuranceCompany implements Cloneable, Serializable {
     return usersShallowCopy;
   }
 
+  public int[] policyCount(String adminUsername, String adminPassword, int[] ranges) {
+    int[] count = new int[ranges.length];
+    Arrays.fill(count, 0);
+    if (!validateAdmin(adminUsername, adminPassword)) return count;
+    for (User user : users.values()) {
+      int[] userPolicyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+      for (int j = 0; j < userPolicyCount.length; j++) {
+        count[j] += userPolicyCount[j];
+      }
+    }
+    return count;
+  }
+
+  public HashMap<String, Integer[]> policyCityCount(String adminUsername, String adminPassword, int[] ranges) {
+    HashMap<String, Integer[]> count = new HashMap<>();
+    if (!validateAdmin(adminUsername, adminPassword)) return count;
+    for (User user : users.values()) {
+      String city = user.getAddress().getCity();
+      Integer[] currentCount = count.get(city);
+      int[] userPolicyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+      if (currentCount == null) {
+        currentCount = new Integer[ranges.length];
+        Arrays.fill(currentCount, 0);
+      }
+      for (int j = 0; j < userPolicyCount.length; j++) {
+        currentCount[j] += userPolicyCount[j];
+      }
+      count.put(city, currentCount);
+    }
+    return count;
+  }
+
+  public int[] userCount(String adminUsername, String adminPassword, int[] ranges) {
+    int[] count = new int[ranges.length];
+    Arrays.fill(count, 0);
+    if (!validateAdmin(adminUsername, adminPassword)) return count;
+    for (User user : users.values()) {
+      int[] userPolicyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+      for (int j = 0; j < userPolicyCount.length; j++) {
+        if (userPolicyCount[j] > 0) {
+          count[j] += 1;
+        }
+      }
+    }
+    return count;
+  }
+
+  public HashMap<String, Integer[]> userCarModelCount(String adminUsername, String adminPassword, int[] ranges) {
+    HashMap<String, Integer[]> count = new HashMap<>();
+    if (!validateAdmin(adminUsername, adminPassword)) return count;
+    for (User user : users.values()) {
+      HashMap<String, Integer[]> userPolicyCarModelCount = user.policyCarModelCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+      for (String carModel : userPolicyCarModelCount.keySet()) {
+        Integer[] currentCount = count.get(carModel);
+        Integer[] carModelCount = userPolicyCarModelCount.get(carModel);
+        if (currentCount == null) {
+          currentCount = new Integer[ranges.length];
+          Arrays.fill(currentCount, 0);
+        }
+        for (int j = 0; j < carModelCount.length; j++) {
+          if (carModelCount[j] > 0) {
+            currentCount[j] += 1;
+          }
+        }
+        count.put(carModel, currentCount);
+      }
+    }
+    return count;
+  }
+
+  public HashMap<String, Integer[]> policyCarModelCount(String adminUsername, String adminPassword, int[] ranges) {
+    HashMap<String, Integer[]> count = new HashMap<>();
+    if (!validateAdmin(adminUsername, adminPassword)) return count;
+    for (User user : users.values()) {
+      HashMap<String, Integer[]> userPolicyCarModelCount = user.policyCarModelCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+      for (String carModel : userPolicyCarModelCount.keySet()) {
+        Integer[] currentCount = count.get(carModel);
+        Integer[] carModelCount = userPolicyCarModelCount.get(carModel);
+        if (currentCount == null) {
+          currentCount = new Integer[ranges.length];
+          Arrays.fill(currentCount, 0);
+        }
+        for (int j = 0; j < carModelCount.length; j++) {
+          currentCount[j] += carModelCount[j];
+        }
+        count.put(carModel, currentCount);
+      }
+    }
+    return count;
+  }
+
   //lab6
   public boolean save(String adminUsername, String adminPassword, String fileName) {
     if (!validateAdmin(adminUsername, adminPassword)) return false;
@@ -808,6 +900,18 @@ public class InsuranceCompany implements Cloneable, Serializable {
     User user = findUser(adminUsername, adminPassword, userID);
     if (user == null) return new ArrayList<>();
     return user.sortPoliciesByDate(userID, password);
+  }
+
+  public int[] policyCount(int userID, String password, int[] ranges) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new int[ranges.length];
+    return user.policyCount(userID, password, ranges, flatRate);
+  }
+
+  public HashMap<String, Integer[]> policyCarModelCount(int userID, String password, int[] ranges) {
+    User user = findUser(adminUsername, adminPassword, userID);
+    if (user == null) return new HashMap<>();
+    return user.policyCarModelCount(userID, password, ranges, flatRate);
   }
 
   public void printUsers(String adminUsername, String adminPassword) {
