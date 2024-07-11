@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public abstract class InsurancePolicy implements Cloneable, Comparable<InsurancePolicy>, Serializable {
   protected int id;
@@ -20,13 +21,16 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
   protected MyDate expiryDate;
   private static int[] idRange = { 300000, 400000 };
 
-  public InsurancePolicy(int id, Car car, int numberOfClaims, String policyHolderName, MyDate expiryDate) throws PolicyException {
+  public InsurancePolicy(int id, Car car, int numberOfClaims, String policyHolderName, MyDate expiryDate) throws PolicyException, PolicyHolderNameException {
+    if (!meetsHolderNamePattern(policyHolderName)) {
+      throw new PolicyHolderNameException(policyHolderName);
+    }
     this.id = id;
     this.car = car;
     this.numberOfClaims = numberOfClaims;
     this.policyHolderName = policyHolderName;
     this.expiryDate = expiryDate;
-    if (id < idRange[0] || id > idRange[1]) {
+    if (!meetsIdPattern(id)) {
       this.id = generateRandomId();
       throw new PolicyException(this.id);
     }
@@ -83,10 +87,19 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
   }
 
   public String toString() {
-    return "ID: " + id + " Car: {" + car + "} NumberOfClaims: " + numberOfClaims + " PolicyHolderName: " + policyHolderName + " ExpiryDate: " + expiryDate;
+    return "ID: " + id + " Car: {" + car + "} NumberOfClaims: " + numberOfClaims + " PolicyHolderName: " + policyHolderName + " PolicyHolderName: " + policyHolderName + " ExpiryDate: " + expiryDate;
   }
 
   abstract double calcPayment(double flatRate);
+
+  public boolean meetsIdPattern(int id) {
+    return idRange[0] <= id  && id <= idRange[1];
+  }
+
+  public boolean meetsHolderNamePattern(String holderName) {
+    String regex = "^[A-Z][a-z]+\s[A-Z][a-z]+$";
+    return Pattern.compile(regex).matcher(holderName).matches();  
+  }
 
   public void carPriceRise(double risePercent) {
     car.priceRise(car.getPrice()*(1+risePercent));
@@ -336,56 +349,67 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
       System.out.println(e);
     } catch (PolicyException e) {
       System.out.println(e);
+    } catch (PolicyHolderNameException e) {
+      System.out.println(e);
     }
     return policies;
   }
 
-  public static HashMap<Integer, InsurancePolicy> extractPoliciesFromFields(int numberOfPolicies, int startIndex, String[] fields) throws PolicyException {
+  public static HashMap<Integer, InsurancePolicy> extractPoliciesFromFields(int numberOfPolicies, int startIndex, String[] fields) throws PolicyException, PolicyHolderNameException {
     HashMap<Integer, InsurancePolicy> policies = new HashMap<>();
+    if (numberOfPolicies == 0 || fields.length == 0) return policies;
     for(int i = 0; i < numberOfPolicies; i++) {
-      String delimitedKey = fields[startIndex + 0];
-      int id = Integer.parseInt(fields[startIndex + 1]);
-      String model = fields[startIndex + 3];
-      CarType type = CarType.valueOf(fields[startIndex + 4]);
-      int manufacturingYear = Integer.parseInt(fields[startIndex + 5]);
-      double price = Double.parseDouble(fields[startIndex + 6]);
-      int numberOfClaims = Integer.parseInt(fields[startIndex + 7]);
-      String policyHolderName = fields[startIndex + 8];
-      int year = Integer.parseInt(fields[startIndex + 10]);
-      int month = Integer.parseInt(fields[startIndex + 11]);
-      int day = Integer.parseInt(fields[startIndex + 12]);
+      String delimitedKey = fields[startIndex++];
+      int id = Integer.parseInt(fields[startIndex++]);
+      startIndex++; // carDelimitedKey
+      String model = fields[startIndex++];
+      CarType type = CarType.valueOf(fields[startIndex++]);
+      int manufacturingYear = Integer.parseInt(fields[startIndex++]);
+      double price = Double.parseDouble(fields[startIndex++]);
+      int numberOfClaims = Integer.parseInt(fields[startIndex++]);
+      String policyHolderName = fields[startIndex++];
+      startIndex++; // dateDelimitedKey
+      int year = Integer.parseInt(fields[startIndex++]);
+      int month = Integer.parseInt(fields[startIndex++]);
+      int day = Integer.parseInt(fields[startIndex++]);
       Car car = new Car(model, type, manufacturingYear, price);
       MyDate expiryDate = new MyDate(year, month, day);
 
       switch (delimitedKey) {
         case ComprehensivePolicy.delimitedKey:
-          int driverAge = Integer.parseInt(fields[startIndex + 13]);
-          int level = Integer.parseInt(fields[startIndex + 14]);
+          int driverAge = Integer.parseInt(fields[startIndex++]);
+          int level = Integer.parseInt(fields[startIndex++]);
           ComprehensivePolicy newComprehensivePolicy = new ComprehensivePolicy(id, car, numberOfClaims, policyHolderName, expiryDate, driverAge, level);
           policies.put(id, newComprehensivePolicy);
-          startIndex += 14;
           break;
         case ThirdPartyPolicy.delimitedKey:
-          String comments = fields[startIndex + 13];
+          String comments = fields[startIndex++];
           ThirdPartyPolicy newThirdPartyPolicy = new ThirdPartyPolicy(id, car, numberOfClaims, policyHolderName, expiryDate, comments);
           policies.put(id, newThirdPartyPolicy);
-          startIndex += 13;
           break;    
       }
-      startIndex++;
     }
     return policies;
   }
 
 }
 
-class PolicyException extends Exception
-{
-    int ID;
-    public PolicyException(int ID) {
-      this.ID = ID;
-    }
-    public String toString() {
-      return "The Policy ID was not valid and a new ID (the generated ID) is generated by admin and assigned for the Policy";
-    }
+class PolicyException extends Exception {
+  int ID;
+  public PolicyException(int ID) {
+    this.ID = ID;
+  }
+  public String toString() {
+    return "The Policy ID was not valid and a new ID (" + ID + ") is generated by admin and assigned for the Policy";
+  }
+}
+
+class PolicyHolderNameException extends Exception {
+  String holderName;
+  public PolicyHolderNameException(String holderName) {
+    this.holderName = holderName;
+  }
+  public String toString() {
+    return "The Policy can not be created with ("+ holderName + ") as Holder Name (pattern: John Doe).";
+  }
 }
