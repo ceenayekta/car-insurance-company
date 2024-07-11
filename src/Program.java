@@ -4,9 +4,10 @@ public class Program {
   public static void main(String[] args) {
     InsuranceCompany insuranceCompany = new InsuranceCompany("Demo", null, "admin", "admin", 50);
     fillData(insuranceCompany);
-    UserInterface UI = new UserInterface(insuranceCompany);
-    UI.mainMenu();
-
+    // UserInterface UI = new UserInterface(insuranceCompany);
+    // UI.mainMenu();
+    new Login(insuranceCompany).setVisible(true);
+            
     // Lab Codes
     // static Scanner inputReader = new Scanner(System.in);
     // System.out.println("--START--");
