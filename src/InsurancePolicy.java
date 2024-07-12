@@ -260,9 +260,14 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
     return (int) ((Math.random() * (idRange[1] - idRange[0])) + idRange[0]);
   }
 
+//  @Override
+//  public int compareTo(InsurancePolicy ip) {
+//    return expiryDate.compareTo(ip.expiryDate);
+//  }
+
   @Override
   public int compareTo(InsurancePolicy ip) {
-    return expiryDate.compareTo(ip.expiryDate);
+    return policyHolderName.compareTo(ip.policyHolderName);
   }
 
   //lab6

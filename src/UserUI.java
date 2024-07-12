@@ -1,8 +1,15 @@
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -15,13 +22,15 @@ import javax.swing.JOptionPane;
 public class UserUI extends javax.swing.JFrame {
     User user;
     ArrayList<String> cities;
+    int flatRate;
     Login login;
     /**
      * Creates new form UserUI
      */
-    public UserUI(User user, ArrayList<String> cities, Login login) {
+    public UserUI(User user, ArrayList<String> cities, int flatRate, Login login) {
         this.user = user;
         this.cities = cities;
+        this.flatRate = flatRate;
         this.login = login;
         initComponents();
     }
@@ -36,8 +45,11 @@ public class UserUI extends javax.swing.JFrame {
     private void initComponents() {
 
         policyTypeButtonGroup = new javax.swing.ButtonGroup();
+        policyActionsPopupMenu = new javax.swing.JPopupMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new javax.swing.JPanel();
+        personalTab = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         userIdField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -58,7 +70,7 @@ public class UserUI extends javax.swing.JFrame {
         updateUserButton = new javax.swing.JButton();
         jLabel23 = new javax.swing.JLabel();
         jSeparator6 = new javax.swing.JSeparator();
-        jPanel2 = new javax.swing.JPanel();
+        addPolicyTab = new javax.swing.JPanel();
         comprehensiveRadioButton = new javax.swing.JRadioButton();
         thirdPartyRadioButton = new javax.swing.JRadioButton();
         jLabel9 = new javax.swing.JLabel();
@@ -98,11 +110,44 @@ public class UserUI extends javax.swing.JFrame {
         jLabel24 = new javax.swing.JLabel();
         jLabel25 = new javax.swing.JLabel();
         jSeparator5 = new javax.swing.JSeparator();
-        jPanel3 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jPanel5 = new javax.swing.JPanel();
+        findPolicyTab = new javax.swing.JPanel();
+        jLabel20 = new javax.swing.JLabel();
+        findPolicyIdField = new javax.swing.JTextField();
+        findButton = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        displayPolicyTextArea = new javax.swing.JTextArea();
+        policiesInformationTab = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        policyTable = new javax.swing.JTable();
+        updatePolicyButton = new javax.swing.JButton();
+        deletePolicyButton = new javax.swing.JButton();
+        filterPoliciesTab = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        policySortTable = new javax.swing.JTable();
+        jLabel21 = new javax.swing.JLabel();
+        carModelFilterField = new javax.swing.JTextField();
+        jLabel22 = new javax.swing.JLabel();
+        expiryDateFilterField = new javax.swing.JTextField();
+        filterByDateButton = new javax.swing.JButton();
+        sortByHolderNameCheckBox = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+
+        jMenuItem1.setText("Update");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updatePolicyButtonActionPerformed(evt);
+            }
+        });
+        policyActionsPopupMenu.add(jMenuItem1);
+
+        jMenuItem2.setText("Delete");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deletePolicyButtonActionPerformed(evt);
+            }
+        });
+        policyActionsPopupMenu.add(jMenuItem2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -184,31 +229,31 @@ public class UserUI extends javax.swing.JFrame {
         jLabel23.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         jLabel23.setText("General Information");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(59, 59, 59)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout personalTabLayout = new javax.swing.GroupLayout(personalTab);
+        personalTab.setLayout(personalTabLayout);
+        personalTabLayout.setHorizontalGroup(
+            personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(personalTabLayout.createSequentialGroup()
+                .addGap(69, 69, 69)
+                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel23)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(personalTabLayout.createSequentialGroup()
+                        .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, personalTabLayout.createSequentialGroup()
+                                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                         .addComponent(suburbField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(streetNumberField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(streetField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -220,23 +265,23 @@ public class UserUI extends javax.swing.JFrame {
                         .addComponent(cityField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(newCityCheckBox)))
-                .addContainerGap(285, Short.MAX_VALUE))
+                .addContainerGap(275, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(13, 13, 13)
+        personalTabLayout.setVerticalGroup(
+            personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(personalTabLayout.createSequentialGroup()
+                .addGap(48, 48, 48)
                 .addComponent(jLabel23)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(userIdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(nameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -244,29 +289,29 @@ public class UserUI extends javax.swing.JFrame {
                 .addGap(3, 3, 3)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(streetNumberField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(streetField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
                     .addComponent(suburbField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(personalTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cityComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cityField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(newCityCheckBox)
                     .addComponent(jLabel8))
                 .addGap(18, 18, 18)
                 .addComponent(updateUserButton)
-                .addContainerGap(336, Short.MAX_VALUE))
+                .addContainerGap(301, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Edit Personal Data", jPanel1);
+        jTabbedPane1.addTab("Edit Personal Data", personalTab);
 
         policyTypeButtonGroup.add(comprehensiveRadioButton);
         comprehensiveRadioButton.setSelected(true);
@@ -355,27 +400,21 @@ public class UserUI extends javax.swing.JFrame {
         jLabel25.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         jLabel25.setText("Additional Information");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout addPolicyTabLayout = new javax.swing.GroupLayout(addPolicyTab);
+        addPolicyTab.setLayout(addPolicyTabLayout);
+        addPolicyTabLayout.setHorizontalGroup(
+            addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(addPolicyTabLayout.createSequentialGroup()
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(addPolicyTabLayout.createSequentialGroup()
                         .addGap(65, 65, 65)
-                        .addComponent(jLabel24))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(64, 64, 64)
-                        .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(65, 65, 65)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel25)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(addPolicyTabLayout.createSequentialGroup()
+                                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(addPollicyButton)
                                     .addComponent(commentLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addGroup(addPolicyTabLayout.createSequentialGroup()
                                         .addComponent(yearField)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(jLabel18)
@@ -387,73 +426,78 @@ public class UserUI extends javax.swing.JFrame {
                                         .addComponent(dayField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, addPolicyTabLayout.createSequentialGroup()
+                                        .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                             .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                             .addComponent(priceField)
                                             .addComponent(manufacturingYearField)
                                             .addComponent(carModelField)
                                             .addComponent(carTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                     .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel17, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, addPolicyTabLayout.createSequentialGroup()
+                                        .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                             .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(holderNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(policyIdField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(numberOfClaimsField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                     .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addGroup(addPolicyTabLayout.createSequentialGroup()
                                         .addComponent(driverAgeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(driverAgeField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addGroup(addPolicyTabLayout.createSequentialGroup()
                                         .addComponent(levelLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(levelField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(123, 123, 123)
                                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGroup(addPolicyTabLayout.createSequentialGroup()
                         .addGap(42, 42, 42)
                         .addComponent(comprehensiveRadioButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(thirdPartyRadioButton)
                         .addGap(96, 96, 96)
-                        .addComponent(clearButton)))
+                        .addComponent(clearButton))
+                    .addGroup(addPolicyTabLayout.createSequentialGroup()
+                        .addGap(65, 65, 65)
+                        .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel24))))
                 .addContainerGap(337, Short.MAX_VALUE))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        addPolicyTabLayout.setVerticalGroup(
+            addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(addPolicyTabLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(thirdPartyRadioButton)
                     .addComponent(comprehensiveRadioButton)
                     .addComponent(clearButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel24)
-                .addGap(1, 1, 1)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGap(7, 7, 7)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
                     .addComponent(policyIdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(holderNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel16)
                     .addComponent(numberOfClaimsField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -461,19 +505,19 @@ public class UserUI extends javax.swing.JFrame {
                 .addGap(9, 9, 9)
                 .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
                     .addComponent(carModelField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
                     .addComponent(carTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel14)
                     .addComponent(priceField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel15)
                     .addComponent(manufacturingYearField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -481,8 +525,8 @@ public class UserUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel17)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(yearField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel19)
                         .addComponent(dayField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -494,11 +538,11 @@ public class UserUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel25)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(driverAgeLabel)
                     .addComponent(driverAgeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(addPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(levelLabel)
                     .addComponent(levelField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -510,46 +554,179 @@ public class UserUI extends javax.swing.JFrame {
                 .addContainerGap(52, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Add Policy", jPanel2);
+        jTabbedPane1.addTab("Add Policy", addPolicyTab);
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 739, Short.MAX_VALUE)
+        jLabel20.setText("Policy ID");
+
+        findButton.setText("Find");
+        findButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                findButtonActionPerformed(evt);
+            }
+        });
+
+        displayPolicyTextArea.setBackground(new java.awt.Color(51, 204, 0));
+        displayPolicyTextArea.setColumns(20);
+        displayPolicyTextArea.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        displayPolicyTextArea.setLineWrap(true);
+        displayPolicyTextArea.setRows(5);
+        displayPolicyTextArea.setDisabledTextColor(new java.awt.Color(51, 51, 51));
+        displayPolicyTextArea.setEnabled(false);
+        jScrollPane2.setViewportView(displayPolicyTextArea);
+
+        javax.swing.GroupLayout findPolicyTabLayout = new javax.swing.GroupLayout(findPolicyTab);
+        findPolicyTab.setLayout(findPolicyTabLayout);
+        findPolicyTabLayout.setHorizontalGroup(
+            findPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(findPolicyTabLayout.createSequentialGroup()
+                .addGap(59, 59, 59)
+                .addGroup(findPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 622, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(findPolicyTabLayout.createSequentialGroup()
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(findPolicyIdField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(findButton)))
+                .addContainerGap(58, Short.MAX_VALUE))
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 630, Short.MAX_VALUE)
+        findPolicyTabLayout.setVerticalGroup(
+            findPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(findPolicyTabLayout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addGroup(findPolicyTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(findButton)
+                    .addComponent(jLabel20)
+                    .addComponent(findPolicyIdField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(389, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Find a Policy", jPanel3);
+        jTabbedPane1.addTab("Find a Policy", findPolicyTab);
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 739, Short.MAX_VALUE)
+        policyTable.setModel(fillTableData(user.getPolicies().values(), null));
+        policyTable.setInheritsPopupMenu(true);
+        policyTable.setComponentPopupMenu(policyActionsPopupMenu);
+        jScrollPane4.setViewportView(policyTable);
+
+        updatePolicyButton.setText("Update");
+        updatePolicyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updatePolicyButtonActionPerformed(evt);
+            }
+        });
+
+        deletePolicyButton.setText("Delete");
+        deletePolicyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deletePolicyButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout policiesInformationTabLayout = new javax.swing.GroupLayout(policiesInformationTab);
+        policiesInformationTab.setLayout(policiesInformationTabLayout);
+        policiesInformationTabLayout.setHorizontalGroup(
+            policiesInformationTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(policiesInformationTabLayout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addComponent(updatePolicyButton)
+                .addGap(18, 18, 18)
+                .addComponent(deletePolicyButton)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(policiesInformationTabLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 727, Short.MAX_VALUE)
+                .addContainerGap())
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 630, Short.MAX_VALUE)
+        policiesInformationTabLayout.setVerticalGroup(
+            policiesInformationTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(policiesInformationTabLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addGroup(policiesInformationTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(updatePolicyButton)
+                    .addComponent(deletePolicyButton))
+                .addGap(0, 341, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Policies Information", jPanel4);
+        jTabbedPane1.addTab("Policies Information", policiesInformationTab);
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 739, Short.MAX_VALUE)
+        policySortTable.setModel(fillTableData(user.getPolicies().values(), null));
+        policySortTable.setInheritsPopupMenu(true);
+        policyTable.setComponentPopupMenu(policyActionsPopupMenu);
+        jScrollPane5.setViewportView(policySortTable);
+
+        jLabel21.setText("Car Model");
+
+        carModelFilterField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                carModelFilterFieldKeyReleased(evt);
+            }
+        });
+
+        jLabel22.setText("Expiry Date");
+
+        filterByDateButton.setText("Filter by Date");
+        filterByDateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterByDateButtonActionPerformed(evt);
+            }
+        });
+
+        sortByHolderNameCheckBox.setText("Sort by HolderName");
+        sortByHolderNameCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sortByHolderNameCheckBoxActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout filterPoliciesTabLayout = new javax.swing.GroupLayout(filterPoliciesTab);
+        filterPoliciesTab.setLayout(filterPoliciesTabLayout);
+        filterPoliciesTabLayout.setHorizontalGroup(
+            filterPoliciesTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(filterPoliciesTabLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 727, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(filterPoliciesTabLayout.createSequentialGroup()
+                .addGap(58, 58, 58)
+                .addGroup(filterPoliciesTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)
+                    .addComponent(jLabel21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(filterPoliciesTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(carModelFilterField, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
+                    .addComponent(expiryDateFilterField))
+                .addGroup(filterPoliciesTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(filterPoliciesTabLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(filterByDateButton))
+                    .addGroup(filterPoliciesTabLayout.createSequentialGroup()
+                        .addGap(144, 144, 144)
+                        .addComponent(sortByHolderNameCheckBox)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 630, Short.MAX_VALUE)
+        filterPoliciesTabLayout.setVerticalGroup(
+            filterPoliciesTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(filterPoliciesTabLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addGroup(filterPoliciesTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel21)
+                    .addComponent(carModelFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(sortByHolderNameCheckBox))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(filterPoliciesTabLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel22)
+                    .addComponent(expiryDateFilterField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(filterByDateButton))
+                .addContainerGap(289, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Filter Policies", jPanel5);
+        jTabbedPane1.addTab("Filter Policies", filterPoliciesTab);
 
         jMenu1.setText("Logout");
         jMenu1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -576,8 +753,6 @@ public class UserUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
-        // TODO add your handling code here:
-        
         if (JOptionPane.showConfirmDialog(rootPane, "Are you sure?", "Logout", JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
             dispose();
             login.setVisible(true);
@@ -715,6 +890,8 @@ public class UserUI extends javax.swing.JFrame {
                 if (result) {
                     JOptionPane.showMessageDialog(rootPane, "Policy '" + holderName + "' with ID (" + policyId + ")" + " created successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                     clearButtonActionPerformed(null);
+                    fillTableData(user.getPolicies().values(), policyTable);
+                    filterPolicies();
                     return;
                 }
                 errorMessage = "Something went wrong while creating! Please try again later.";
@@ -762,9 +939,129 @@ public class UserUI extends javax.swing.JFrame {
         jScrollPane1.setVisible(thirdPartyRadioButton.isSelected());
     }//GEN-LAST:event_policyTypeRadioItemStateChange
 
+    private void findButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findButtonActionPerformed
+        Integer policyId = safeGetInputInteger(findPolicyIdField.getText());
+        if (policyId == null) JOptionPane.showMessageDialog(rootPane, "Policy ID should be a number and greater than Zero!", "Error", JOptionPane.ERROR_MESSAGE);
+        InsurancePolicy foundPolicy = user.findPolicy(user.getUserID(), user.getPassword(), policyId);
+        ArrayList<Integer> allPolicyIds = new ArrayList<>();
+        for (InsurancePolicy policy : user.getPolicies().values()) {
+            allPolicyIds.add(policy.getId());
+        }
+        displayPolicyTextArea.setText(displayPolicyTextArea.getText() + (
+            foundPolicy == null ?
+                "There's no policy with id " + policyId + ". Choose one from: " + allPolicyIds.toString() :
+                foundPolicy) + "\n"
+        );
+    }//GEN-LAST:event_findButtonActionPerformed
+
+    private DefaultTableModel fillTableData(Collection<InsurancePolicy> policies, JTable table) {
+        String[] headers = new String[] { "Policy ID", "Holder Name", "Car Model", "Car Type", "Car Price", "Manufacury Year", "Number of Claims", "Driver Age", "Level", "Total Price", "Comments", "Expiry Date" };
+        DefaultTableModel model = new DefaultTableModel(headers, 0) {
+            Class[] types = new Class[] {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.String.class, java.lang.String.class
+            };
+            public Class getColumnClass(int columnIndex) {
+                return types[columnIndex];
+            }
+        };
+        if (table != null) table.setModel(model);
+        for (InsurancePolicy policy : policies) {
+            ArrayList<Object> row = new ArrayList<>();
+            row.add(policy.getId());
+            row.add(policy.getPolicyHolderName());
+            row.add(policy.getCar().getModel());
+            row.add(policy.getCar().getType().name());
+            row.add(policy.getCar().getPrice());
+            row.add(policy.getCar().getManufacturingYear());
+            row.add(policy.getNumberOfClaims());
+            row.add(policy instanceof ComprehensivePolicy ? (((ComprehensivePolicy) policy).getDriverAge()) : "NA");
+            row.add(policy instanceof ComprehensivePolicy ? (((ComprehensivePolicy) policy).getLevel()) : "NA");
+            row.add(policy.calcPayment(flatRate));
+            row.add(policy instanceof ThirdPartyPolicy ? (((ThirdPartyPolicy) policy).getComments()) : "NA");
+            row.add(policy.getExpiryDate().toString());
+            model.addRow(row.toArray());
+        }
+        return model;
+    }
+    
+    private void updatePolicyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updatePolicyButtonActionPerformed
+        if (policyTable.getSelectedRow() > -1) {
+            setVisible(false);
+            InsurancePolicy policy = (InsurancePolicy) user.getPolicies().values().toArray()[policyTable.getSelectedRow()];
+            new UpdateUI(policy, this) {
+                @Override
+                public void dispose() {
+                    super.dispose();
+                    fillTableData(user.getPolicies().values(), policyTable);
+                    filterPolicies();
+                }
+            }.setVisible(true);
+        }
+    }//GEN-LAST:event_updatePolicyButtonActionPerformed
+
+    private void deletePolicyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletePolicyButtonActionPerformed
+        if (policyTable.getSelectedRows().length > 0) {
+            if (JOptionPane.showConfirmDialog(rootPane, "Are you sure you wanna delete " + policyTable.getSelectedRows().length + " selected policy?", "Delete Policy", JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                for (int rowIndex : policyTable.getSelectedRows()) {
+                    InsurancePolicy selectedPolicy = user.getPolicies().get(
+                        ((InsurancePolicy) user.getPolicies().values().toArray()[rowIndex]).getId()
+                    );
+                    user.removePolicy(user.getUserID(), user.getPassword(), selectedPolicy);
+                    ((DefaultTableModel) policyTable.getModel()).removeRow(rowIndex);
+                }
+                filterPolicies();
+            }
+        }
+
+    }//GEN-LAST:event_deletePolicyButtonActionPerformed
+
+    private void filterPolicies() {
+        try {
+            ArrayList<InsurancePolicy> policies = user.shallowCopyPolicies(user.getUserID(), user.getPassword());
+            String carModel = carModelFilterField.getText();
+            if (!carModel.isEmpty()) {
+                policies = new ArrayList<>(user.filterByCarModel(user.getUserID(), user.getPassword(), carModel).values());
+            }
+            String expiryDateText = expiryDateFilterField.getText();
+            if (!expiryDateText.isEmpty()) {
+                String[] splitedDateText = expiryDateText.split("/");
+                if (splitedDateText.length != 3) throw new Exception("Invalid Expiry Date! Format should be year/month/day");
+                Integer year = safeGetInputInteger(splitedDateText[0]);
+                Integer month = safeGetInputInteger(splitedDateText[1]);
+                Integer day = safeGetInputInteger(splitedDateText[2]);
+                if (year == null) throw new Exception("Expiry year should be a number and greater than Zero!");
+                if (month == null) throw new Exception("Expiry month should be a number and greater than Zero!");
+                if (day == null) throw new Exception("Expiry day should be a number and greater than Zero!");
+                MyDate expiryDate = MyDate.createValidDate(year, month, day);
+                policies = new ArrayList<>(user.filterByExpiryDate(user.getUserID(), user.getPassword(), expiryDate).values());
+            }
+            if (sortByHolderNameCheckBox.isSelected()) {
+                // ArrayList<InsurancePolicy> sortedPolicies = new ArrayList<>(policies.values());
+                Collections.sort(policies);
+            }
+            fillTableData(policies, policySortTable);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(rootPane, e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void filterByDateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterByDateButtonActionPerformed
+        filterPolicies();
+    }//GEN-LAST:event_filterByDateButtonActionPerformed
+
+    private void sortByHolderNameCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sortByHolderNameCheckBoxActionPerformed
+        filterPolicies();
+    }//GEN-LAST:event_sortByHolderNameCheckBoxActionPerformed
+
+    private void carModelFilterFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_carModelFilterFieldKeyReleased
+        filterPolicies();
+    }//GEN-LAST:event_carModelFilterFieldKeyReleased
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel addPolicyTab;
     private javax.swing.JButton addPollicyButton;
     private javax.swing.JTextField carModelField;
+    private javax.swing.JTextField carModelFilterField;
     private javax.swing.JComboBox<String> carTypeComboBox;
     private javax.swing.JComboBox<String> cityComboBox;
     private javax.swing.JTextField cityField;
@@ -773,8 +1070,16 @@ public class UserUI extends javax.swing.JFrame {
     private javax.swing.JTextArea commentsTextArea;
     private javax.swing.JRadioButton comprehensiveRadioButton;
     private javax.swing.JTextField dayField;
+    private javax.swing.JButton deletePolicyButton;
+    private javax.swing.JTextArea displayPolicyTextArea;
     private javax.swing.JTextField driverAgeField;
     private javax.swing.JLabel driverAgeLabel;
+    private javax.swing.JTextField expiryDateFilterField;
+    private javax.swing.JButton filterByDateButton;
+    private javax.swing.JPanel filterPoliciesTab;
+    private javax.swing.JButton findButton;
+    private javax.swing.JTextField findPolicyIdField;
+    private javax.swing.JPanel findPolicyTab;
     private javax.swing.JTextField holderNameField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -788,6 +1093,9 @@ public class UserUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
@@ -800,12 +1108,12 @@ public class UserUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
@@ -821,13 +1129,20 @@ public class UserUI extends javax.swing.JFrame {
     private javax.swing.JCheckBox newCityCheckBox;
     private javax.swing.JTextField numberOfClaimsField;
     private javax.swing.JTextField passwordField;
+    private javax.swing.JPanel personalTab;
+    private javax.swing.JPanel policiesInformationTab;
+    private javax.swing.JPopupMenu policyActionsPopupMenu;
     private javax.swing.JTextField policyIdField;
+    private javax.swing.JTable policySortTable;
+    private javax.swing.JTable policyTable;
     private javax.swing.ButtonGroup policyTypeButtonGroup;
     private javax.swing.JTextField priceField;
+    private javax.swing.JCheckBox sortByHolderNameCheckBox;
     private javax.swing.JTextField streetField;
     private javax.swing.JTextField streetNumberField;
     private javax.swing.JTextField suburbField;
     private javax.swing.JRadioButton thirdPartyRadioButton;
+    private javax.swing.JButton updatePolicyButton;
     private javax.swing.JButton updateUserButton;
     private javax.swing.JTextField userIdField;
     private javax.swing.JTextField yearField;

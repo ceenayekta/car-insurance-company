@@ -163,7 +163,7 @@ public class Login extends javax.swing.JFrame {
             User user = company.validateUser(username, passwordField.getText());
             if (user == null) throw new Exception();
             ArrayList<String> cities = company.populateDistinctCityNames(company.getAdminUsername(), company.getAdminPassword());
-            new UserUI(user, cities, this).setVisible(true);
+            new UserUI(user, cities, company.getFlatRate(), this).setVisible(true);
             setVisible(false);
             passwordField.setText("");
         } catch (Exception e) {
