@@ -4,9 +4,10 @@ public class Program {
   public static void main(String[] args) {
     InsuranceCompany insuranceCompany = new InsuranceCompany("Demo", null, "admin", "admin", 50);
     fillData(insuranceCompany);
-    UserInterface UI = new UserInterface(insuranceCompany);
-    UI.mainMenu();
-
+    // UserInterface UI = new UserInterface(insuranceCompany);
+    // UI.mainMenu();
+    new Login(insuranceCompany).setVisible(true);
+            
     // Lab Codes
     // static Scanner inputReader = new Scanner(System.in);
     // System.out.println("--START--");
@@ -187,10 +188,10 @@ public class Program {
       carToyota300.setPrice(30000);
       Car carNissan1000 = new Car(carNissan);
       carNissan1000.setPrice(100000);
-      ThirdPartyPolicy saraPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota200, 0, "Sara Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
-      ThirdPartyPolicy saraPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota500, 0, "Sara Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
-      ThirdPartyPolicy saraPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota300, 0, "Sara Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
-      ThirdPartyPolicy saraPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carNissan1000, 0, "Sara Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
+      ThirdPartyPolicy saraPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota200, 0, "Asara Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
+      ThirdPartyPolicy saraPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota500, 0, "Dsara Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
+      ThirdPartyPolicy saraPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota300, 0, "Csara Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
+      ThirdPartyPolicy saraPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carNissan1000, 0, "Bsara Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
       userSara.addPolicy(userSara.getUserID(), userSara.getPassword(), saraPolicy1);
       userSara.addPolicy(userSara.getUserID(), userSara.getPassword(), saraPolicy2);
       userSara.addPolicy(userSara.getUserID(), userSara.getPassword(), saraPolicy3);
@@ -205,10 +206,10 @@ public class Program {
       car2Nissan1000.setPrice(100000);
       Car carFord2000 = new Car(carFord);
       carFord2000.setPrice(200000);
-      ThirdPartyPolicy johnPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carNissan500, 0, "John Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
-      ThirdPartyPolicy johnPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota100, 0, "John Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
-      ThirdPartyPolicy johnPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car2Nissan1000, 0, "John Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
-      ThirdPartyPolicy johnPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFord2000, 0, "John Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
+      ThirdPartyPolicy johnPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carNissan500, 0, "Ajohn Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
+      ThirdPartyPolicy johnPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota100, 0, "Djohn Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
+      ThirdPartyPolicy johnPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car2Nissan1000, 0, "Cjohn Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
+      ThirdPartyPolicy johnPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFord2000, 0, "Bjohn Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
       userJohn.addPolicy(userJohn.getUserID(), userJohn.getPassword(), johnPolicy1);
       userJohn.addPolicy(userJohn.getUserID(), userJohn.getPassword(), johnPolicy2);
       userJohn.addPolicy(userJohn.getUserID(), userJohn.getPassword(), johnPolicy3);
@@ -223,10 +224,10 @@ public class Program {
       carToyota5000.setPrice(500000);
       Car carPorsche400 = new Car(carPorsche);
       carPorsche400.setPrice(40000);
-      ThirdPartyPolicy robertPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFord150, 0, "Robert Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
-      ThirdPartyPolicy robertPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car3Nissan1000, 0, "Robert Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
-      ThirdPartyPolicy robertPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota5000, 0, "Robert Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
-      ThirdPartyPolicy robertPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carPorsche400, 0, "Robert Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
+      ThirdPartyPolicy robertPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFord150, 0, "Arobert Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
+      ThirdPartyPolicy robertPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car3Nissan1000, 0, "Drobert Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
+      ThirdPartyPolicy robertPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota5000, 0, "Crobert Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
+      ThirdPartyPolicy robertPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carPorsche400, 0, "Brobert Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
       userRobert.addPolicy(userRobert.getUserID(), userRobert.getPassword(), robertPolicy1);
       userRobert.addPolicy(userRobert.getUserID(), userRobert.getPassword(), robertPolicy2);
       userRobert.addPolicy(userRobert.getUserID(), userRobert.getPassword(), robertPolicy3);
@@ -237,8 +238,8 @@ public class Program {
       carFerrari500.setPrice(50000);
       Car car4Nissan1000 = new Car(carNissan);
       car4Nissan1000.setPrice(100000);
-      ThirdPartyPolicy alexPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFerrari500, 0, "Alex Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
-      ThirdPartyPolicy alexPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car4Nissan1000, 0, "Alex Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
+      ThirdPartyPolicy alexPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFerrari500, 0, "Balex Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
+      ThirdPartyPolicy alexPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car4Nissan1000, 0, "Aalex Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
       userAlex.addPolicy(userAlex.getUserID(), userAlex.getPassword(), alexPolicy1);
       userAlex.addPolicy(userAlex.getUserID(), userAlex.getPassword(), alexPolicy2);
 

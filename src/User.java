@@ -69,12 +69,16 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     return name;
   }
 
+  public void setName(String name) {
+    this.name = name;
+  }
+
   public String getPassword() {
     return password;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setPassword(String password) {
+    this.password = password;
   }
 
   public Address getAddress() {
