@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 //lab3
 public class InsuranceCompany implements Cloneable, Serializable {
@@ -193,6 +194,13 @@ public class InsuranceCompany implements Cloneable, Serializable {
     return user.calcTotalPayments(user.getUserID(), user.getPassword(), flatRate);
   }
 
+  public double calcTotalPayments(String adminUsername, String adminPassword) {
+    if (!validateAdmin(adminUsername, adminPassword)) return 0;
+    return users.values().stream()
+      .mapToDouble(user -> user.calcTotalPayments(user.getUserID(), user.getPassword(), flatRate))
+      .sum();
+  }
+
   public boolean carPriceRise(String adminUsername, String adminPassword, int userID, double risePercent) {
     if (!validateAdmin(adminUsername, adminPassword)) return false;
     User user = findUser(adminUsername, adminPassword, userID);
@@ -203,9 +211,11 @@ public class InsuranceCompany implements Cloneable, Serializable {
 
   public void carPriceRise(String adminUsername, String adminPassword, double risePercent) {
     if (!validateAdmin(adminUsername, adminPassword)) return;
-    for (User user : users.values()) {
-      user.carRisePriceAll(user.getUserID(), user.getPassword(), risePercent);
-    }
+    // for (User user : users.values()) {
+    //   user.carRisePriceAll(user.getUserID(), user.getPassword(), risePercent);
+    // }
+    users.values().stream()
+      .forEach(user -> user.carRisePriceAll(user.getUserID(), user.getPassword(), risePercent));
   }
 
   // public ArrayList<InsurancePolicy> allPolicies() {
@@ -260,12 +270,10 @@ public class InsuranceCompany implements Cloneable, Serializable {
   // }
 
   public HashMap<Integer, InsurancePolicy> filterByCarModel(String adminUsername, String adminPassword, String carModel) {
-    HashMap<Integer, InsurancePolicy> result = new HashMap<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return result;
-    for (User user : users.values()) {
-      result.putAll(user.filterByCarModel(user.getUserID(), user.getPassword(), carModel));
-    }
-    return result;
+    if (!validateAdmin(adminUsername, adminPassword)) return new HashMap<>();
+    return (HashMap<Integer, InsurancePolicy>) (users.values().stream()
+      .flatMap(user -> user.filterByCarModel(user.getUserID(), user.getPassword(), carModel).values().stream())
+      .collect(Collectors.toMap(InsurancePolicy::getId, policy -> policy)));
   }
 
   // public ArrayList<InsurancePolicy> filterByExpiryDate(MyDate date) {
@@ -385,15 +393,19 @@ public class InsuranceCompany implements Cloneable, Serializable {
   
   //lab5
   public HashMap<String, Double> getTotalPremiumPerCity(String adminUsername, String adminPassword) {
-    HashMap<String, Double> totals = new HashMap<String, Double>();
-    if (!validateAdmin(adminUsername, adminPassword)) return totals;
-    for (User user : users.values()) {
-      Double total = totals.get(user.getAddress().getCity());
-      Double calculatedTotal = user.calcTotalPayments(user.getUserID(), user.getPassword(), flatRate);
-      total = total == null ? calculatedTotal : total + calculatedTotal;
-      totals.put(user.getAddress().getCity(), total);
-    }
-    return totals;
+    if (!validateAdmin(adminUsername, adminPassword)) return new HashMap<>();
+    // for (User user : users.values()) {
+    //   Double total = totals.get(user.getAddress().getCity());
+    //   Double calculatedTotal = user.calcTotalPayments(user.getUserID(), user.getPassword(), flatRate);
+    //   total = total == null ? calculatedTotal : total + calculatedTotal;
+    //   totals.put(user.getAddress().getCity(), total);
+    // }
+    // return totals;
+    return (HashMap<String, Double>) users.values().stream()
+      .collect(Collectors.groupingBy(
+        user -> user.getAddress().getCity(),
+        Collectors.summingDouble(user -> user.calcTotalPayments(user.getUserID(), user.getPassword(), flatRate))
+      ));
   }
   
   public HashMap<String, Integer> getTotalCountPerCarModel(String adminUsername, String adminPassword) {

@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class User implements Cloneable, Comparable<User>, Serializable {
   public static int idCounter = 0;
@@ -23,6 +25,14 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   // private ArrayList<InsurancePolicy> policies;
   private HashMap<Integer, InsurancePolicy> policies;
   public final static String delimitedKey = "U";
+
+  private static Function<User, User> clonePolicySafely = user -> {
+    try {
+      return user.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
+  };
 
   public User(
     String name,
@@ -121,11 +131,13 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   public void printPolicies(int userID, String password, int flatRate) {
     if (!validateUser(userID, password)) return;
     System.out.println("");
-    for (InsurancePolicy policy : policies.values()) {
-      policy.print();
-      System.out.print("PremiumPayment: " + policy.calcPayment(flatRate));
-      System.out.println();
-    }
+    // for (InsurancePolicy policy : policies.values()) {
+    //   policy.print();
+    //   System.out.print("PremiumPayment: " + policy.calcPayment(flatRate));
+    //   System.out.println();
+    // }
+    policies.values().stream()
+      .forEach(policy -> System.out.print("PremiumPayment: " + policy.calcPayment(flatRate) + "\n"));
     System.out.println(", ");
   }
   
@@ -313,51 +325,65 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   }
   
   public static ArrayList<User> shallowCopy(ArrayList<User> users) {
-    ArrayList<User> shallowCopy = new ArrayList<User>();
-    for (User user : users) {
-      shallowCopy.add(user);
-    }
-    return shallowCopy;
+    // ArrayList<User> shallowCopy = new ArrayList<User>();
+    // for (User user : users) {
+    //   shallowCopy.add(user);
+    // }
+    // return shallowCopy;
+    return (ArrayList<User>) (users.stream()
+      .collect(Collectors.toList()));
   }
   
   public static ArrayList<User> shallowCopy(HashMap<Integer, User> users) {
-    ArrayList<User> shallowCopy = new ArrayList<User>();
-    for (User user : users.values()) {
-      shallowCopy.add(user);
-    }
-    return shallowCopy;
+    // ArrayList<User> shallowCopy = new ArrayList<User>();
+    // for (User user : users.values()) {
+    //   shallowCopy.add(user);
+    // }
+    // return shallowCopy;
+    return (ArrayList<User>) (users.values().stream()
+      .collect(Collectors.toList()));
   }
   
   public static HashMap<Integer, User> shallowCopyHashMap(HashMap<Integer, User> users) {
-    HashMap<Integer, User> shallowCopy = new HashMap<Integer, User>();
-    for (User user : users.values()) {
-      shallowCopy.put(user.userID, user);
-    }
-    return shallowCopy;
+    // HashMap<Integer, User> shallowCopy = new HashMap<Integer, User>();
+    // for (User user : users.values()) {
+    //   shallowCopy.put(user.userID, user);
+    // }
+    // return shallowCopy;
+    return (HashMap<Integer, User>) (users.values().stream()
+      .collect(Collectors.toMap(user -> user.getUserID(), user -> user)));
   }
 
 	public static ArrayList<User> deepCopy(ArrayList<User> users) throws CloneNotSupportedException {
-    ArrayList<User> deepCopy = new ArrayList<User>();
-    for (User user : users) {
-      deepCopy.add(user.clone());
-    }
-    return deepCopy;
+    // ArrayList<User> deepCopy = new ArrayList<User>();
+    // for (User user : users) {
+    //   deepCopy.add(user.clone());
+    // }
+    // return deepCopy;
+    return (ArrayList<User>) (users.stream()
+      .map(clonePolicySafely)
+      .collect(Collectors.toCollection(ArrayList::new)));
   }
 
 	public static ArrayList<User> deepCopy(HashMap<Integer, User> users) throws CloneNotSupportedException {
-    ArrayList<User> deepCopy = new ArrayList<User>();
-    for (User user : users.values()) {
-      deepCopy.add(user.clone());
-    }
-    return deepCopy;
+    // ArrayList<User> deepCopy = new ArrayList<User>();
+    // for (User user : users.values()) {
+    //   deepCopy.add(user.clone());
+    // }
+    // return deepCopy;
+    return (ArrayList<User>) (users.values().stream()
+      .map(clonePolicySafely)
+      .collect(Collectors.toCollection(ArrayList::new)));
   }
 
 	public static HashMap<Integer, User> deepCopyHashMap(HashMap<Integer, User> users) throws CloneNotSupportedException {
-    HashMap<Integer, User> deepCopy = new HashMap<Integer, User>();
-    for (User user : users.values()) {
-      deepCopy.put(user.userID, user.clone());
-    }
-    return deepCopy;
+    // HashMap<Integer, User> deepCopy = new HashMap<Integer, User>();
+    // for (User user : users.values()) {
+    //   deepCopy.put(user.userID, user.clone());
+    // }
+    // return deepCopy;
+    return (HashMap<Integer, User>) (users.values().stream()
+      .collect(Collectors.toMap(user -> user.getUserID(), clonePolicySafely)));
   }
   
   public ArrayList<InsurancePolicy> shallowCopyPolicies(int userID, String password) {

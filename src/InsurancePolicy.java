@@ -11,7 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public abstract class InsurancePolicy implements Cloneable, Comparable<InsurancePolicy>, Serializable {
   protected int id;
@@ -20,6 +22,14 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
   protected String policyHolderName;
   protected MyDate expiryDate;
   private static int[] idRange = { 300000, 400000 };
+
+  private static Function<InsurancePolicy, InsurancePolicy> clonePolicySafely = policy -> {
+    try {
+      return policy.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
+  };
 
   public InsurancePolicy(int id, Car car, int numberOfClaims, String policyHolderName, MyDate expiryDate) throws PolicyException, PolicyHolderNameException {
     if (!meetsHolderNamePattern(policyHolderName)) {
@@ -110,89 +120,111 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
   }
   
   public static void printPolicies(ArrayList<InsurancePolicy> policies) {
-    for (InsurancePolicy policy : policies) {
-      System.out.println(policy);
-    }
+    // for (InsurancePolicy policy : policies) {
+    //   System.out.println(policy);
+    // }
+    policies.forEach(System.out::println);
   }
   
   //lab5
   public static void printPolicies(HashMap<Integer, InsurancePolicy> policies) {
-    for (InsurancePolicy policy : policies.values()) {
-      System.out.println(policy);
-    }
+    // for (InsurancePolicy policy : policies.values()) {
+    //   System.out.println(policy);
+    // }
+    policies.values().forEach(System.out::println); 
   }
 
   public static double calcTotalPayments(ArrayList<InsurancePolicy> policies, int flatRate) {
-    double totalPayment = 0;
-    for (InsurancePolicy policy : policies) {
-        totalPayment += policy.calcPayment(flatRate);
-    }
-    return totalPayment;
+    // double totalPayment = 0;
+    // for (InsurancePolicy policy : policies) {
+    //     totalPayment += policy.calcPayment(flatRate);
+    // }
+    // return totalPayment;
+    return policies.stream()
+      .mapToDouble(policy -> policy.calcPayment(flatRate))
+      .sum();
   }
 
   //lab5
   public static double calcTotalPayments(HashMap<Integer, InsurancePolicy> policies, int flatRate) {
-    double totalPayment = 0;
-    for (InsurancePolicy policy : policies.values()) {
-        totalPayment += policy.calcPayment(flatRate);
-    }
-    return totalPayment;
+    // double totalPayment = 0;
+    // for (InsurancePolicy policy : policies.values()) {
+    //     totalPayment += policy.calcPayment(flatRate);
+    // }
+    // return totalPayment;
+    return policies.values().stream()
+      .mapToDouble(policy -> policy.calcPayment(flatRate))
+      .sum();
   }
 
   public static void carPriceRiseAll(ArrayList<InsurancePolicy> policies, double flatRate) {
-    for (InsurancePolicy policy : policies) {
-      policy.carPriceRise(flatRate);
-    }
+    // for (InsurancePolicy policy : policies) {
+    //   policy.carPriceRise(flatRate);
+    // }
+    policies.forEach(policy -> policy.carPriceRise(flatRate));
   }
   
   //lab5
   public static void carPriceRiseAll(HashMap<Integer, InsurancePolicy> policies, double flatRate) {
-    for (InsurancePolicy policy : policies.values()) {
-      policy.carPriceRise(flatRate);
-    }
+    // for (InsurancePolicy policy : policies.values()) {
+    //   policy.carPriceRise(flatRate);
+    // }
+    policies.values().forEach(policy -> policy.carPriceRise(flatRate));
   }
 
   public static ArrayList<InsurancePolicy> filterByCarModel(ArrayList<InsurancePolicy> policies, String model) {
-    ArrayList<InsurancePolicy> result = new ArrayList<>();
-    for (InsurancePolicy policy : policies) {
-      if (policy.getCar().getModel().contains(model)) {
-        result.add(policy);
-      }
-    }
-    return result;
+    // ArrayList<InsurancePolicy> result = new ArrayList<>();
+    // for (InsurancePolicy policy : policies) {
+    //   if (policy.getCar().getModel().contains(model)) {
+    //     result.add(policy);
+    //   }
+    // }
+    // return result;
+    return (ArrayList<InsurancePolicy>) (policies.stream()
+      .filter(policy -> policy.getCar().getModel().contains(model))
+      .collect(Collectors.toList()));
   }
   
   //lab5
   public static HashMap<Integer, InsurancePolicy> filterByCarModel(HashMap<Integer, InsurancePolicy> policies, String model) {
-    HashMap<Integer, InsurancePolicy> result = new HashMap<>();
-    for (InsurancePolicy policy : policies.values()) {
-      if (policy.getCar().getModel().contains(model)) {
-        result.put(policy.id, policy);
-      }
-    }
-    return result;
+    // HashMap<Integer, InsurancePolicy> result = new HashMap<>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   if (policy.getCar().getModel().contains(model)) {
+    //     result.put(policy.id, policy);
+    //   }
+    // }
+    // return result;
+    return (HashMap<Integer, InsurancePolicy>) (policies.values().stream()
+      .filter(policy -> policy.getCar().getModel().contains(model))
+      .collect(Collectors.toMap(InsurancePolicy::getId, policy -> policy)));
   }
 
   //lab3
   public static ArrayList<InsurancePolicy> filterByExpiryDate(ArrayList<InsurancePolicy> policies, MyDate date) {
-    ArrayList<InsurancePolicy> result = new ArrayList<>();
-    for (InsurancePolicy policy : policies) {
-      if (policy.getExpiryDate().isExpired(date)) {
-        result.add(policy);
-      }
-    }
-    return result;
+    // ArrayList<InsurancePolicy> result = new ArrayList<>();
+    // for (InsurancePolicy policy : policies) {
+    //   if (policy.getExpiryDate().isExpired(date)) {
+    //     result.add(policy);
+    //   }
+    // }
+    // return result;
+    return (ArrayList<InsurancePolicy>) (policies.stream()
+      .filter(policy -> policy.getExpiryDate().isExpired(date))
+      .collect(Collectors.toList()));
   }
   
   //lab5
   public static HashMap<Integer, InsurancePolicy> filterByExpiryDate(HashMap<Integer, InsurancePolicy> policies, MyDate date) {
-    HashMap<Integer, InsurancePolicy> result = new HashMap<>();
-    for (InsurancePolicy policy : policies.values()) {
-      if (policy.getExpiryDate().isExpired(date)) {
-        result.put(policy.id, policy);
-      }
-    }
-    return result;
+    // HashMap<Integer, InsurancePolicy> result = new HashMap<>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   if (policy.getExpiryDate().isExpired(date)) {
+    //     result.put(policy.id, policy);
+    //   }
+    // }
+    // return result;
+    return (HashMap<Integer, InsurancePolicy>) (policies.values().stream()
+      .filter(policy -> policy.getExpiryDate().isExpired(date))
+      .collect(Collectors.toMap(InsurancePolicy::getId, policy -> policy)));
   }
 
   //lab4
@@ -205,55 +237,69 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
   }
   
   public static ArrayList<InsurancePolicy> shallowCopy(ArrayList<InsurancePolicy> policies) {
-    ArrayList<InsurancePolicy> shallowCopy = new ArrayList<InsurancePolicy>();
-    for (InsurancePolicy policy : policies) {
-      shallowCopy.add(policy);
-    }
-    return shallowCopy;
+    // ArrayList<InsurancePolicy> shallowCopy = new ArrayList<InsurancePolicy>();
+    // for (InsurancePolicy policy : policies) {
+    //   shallowCopy.add(policy);
+    // }
+    // return shallowCopy;
+    return (ArrayList<InsurancePolicy>) (policies.stream()
+      .collect(Collectors.toList()));
   }
 
   //lab5
   public static ArrayList<InsurancePolicy> shallowCopy(HashMap<Integer, InsurancePolicy> policies) {
-    ArrayList<InsurancePolicy> shallowCopy = new ArrayList<InsurancePolicy>();
-    for (InsurancePolicy policy : policies.values()) {
-      shallowCopy.add(policy);
-    }
-    return shallowCopy;
+    // ArrayList<InsurancePolicy> shallowCopy = new ArrayList<InsurancePolicy>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   shallowCopy.add(policy);
+    // }
+    // return shallowCopy;
+    return (ArrayList<InsurancePolicy>) (policies.values().stream()
+      .collect(Collectors.toList()));
   }
   
   //lab5
   public static HashMap<Integer, InsurancePolicy> shallowCopyHashMap(HashMap<Integer, InsurancePolicy> policies) {
-    HashMap<Integer, InsurancePolicy> shallowCopy = new HashMap<Integer, InsurancePolicy>();
-    for (InsurancePolicy policy : policies.values()) {
-      shallowCopy.put(policy.id, policy);
-    }
-    return shallowCopy;
+    // HashMap<Integer, InsurancePolicy> shallowCopy = new HashMap<Integer, InsurancePolicy>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   shallowCopy.put(policy.id, policy);
+    // }
+    // return shallowCopy;
+    return (HashMap<Integer, InsurancePolicy>) (policies.values().stream()
+      .collect(Collectors.toMap(InsurancePolicy::getId, policy -> policy)));
   }
 
 	public static ArrayList<InsurancePolicy> deepCopy(ArrayList<InsurancePolicy> policies) throws CloneNotSupportedException {
-    ArrayList<InsurancePolicy> deepCopy = new ArrayList<InsurancePolicy>();
-    for (InsurancePolicy policy : policies) {
-      deepCopy.add(policy.clone());
-    }
-    return deepCopy;
+    // ArrayList<InsurancePolicy> deepCopy = new ArrayList<InsurancePolicy>();
+    // for (InsurancePolicy policy : policies) {
+    //   deepCopy.add(policy.clone());
+    // }
+    // return deepCopy;
+    return (ArrayList<InsurancePolicy>) (policies.stream()
+      .map(clonePolicySafely)
+      .collect(Collectors.toCollection(ArrayList::new)));
   }
 
   //lab5
 	public static ArrayList<InsurancePolicy> deepCopy(HashMap<Integer, InsurancePolicy> policies) throws CloneNotSupportedException {
-    ArrayList<InsurancePolicy> deepCopy = new ArrayList<InsurancePolicy>();
-    for (InsurancePolicy policy : policies.values()) {
-      deepCopy.add(policy.clone());
-    }
-    return deepCopy;
+    // ArrayList<InsurancePolicy> deepCopy = new ArrayList<InsurancePolicy>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   deepCopy.add(policy.clone());
+    // }
+    // return deepCopy;
+    return (ArrayList<InsurancePolicy>) (policies.values().stream()
+      .map(clonePolicySafely)
+      .collect(Collectors.toCollection(ArrayList::new)));
   }
   
   //lab5
 	public static HashMap<Integer, InsurancePolicy> deepCopyHashMap(HashMap<Integer, InsurancePolicy> policies) throws CloneNotSupportedException {
-    HashMap<Integer, InsurancePolicy> deepCopy = new HashMap<Integer, InsurancePolicy>();
-    for (InsurancePolicy policy : policies.values()) {
-      deepCopy.put(policy.id, policy.clone());
-    }
-    return deepCopy;
+    // HashMap<Integer, InsurancePolicy> deepCopy = new HashMap<Integer, InsurancePolicy>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   deepCopy.put(policy.id, policy.clone());
+    // }
+    // return deepCopy;
+    return (HashMap<Integer, InsurancePolicy>) (policies.values().stream()
+      .collect(Collectors.toMap(InsurancePolicy::getId, clonePolicySafely)));
   }
 
   public static int generateRandomId() {
