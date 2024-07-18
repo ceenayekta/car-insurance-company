@@ -1,9 +1,17 @@
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
 
 public class Program {
     
   public static void main(String[] args) {
     InsuranceCompany insuranceCompany = new InsuranceCompany("Demo", null, "admin", "admin", 50);
     fillData(insuranceCompany);
+    lambdaTestCode(insuranceCompany);
     // UserInterface UI = new UserInterface(insuranceCompany);
     // UI.mainMenu();
     new Login(insuranceCompany).setVisible(true);
@@ -188,10 +196,10 @@ public class Program {
       carToyota300.setPrice(30000);
       Car carNissan1000 = new Car(carNissan);
       carNissan1000.setPrice(100000);
-      ThirdPartyPolicy saraPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota200, 0, "Asara Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
-      ThirdPartyPolicy saraPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota500, 0, "Dsara Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
-      ThirdPartyPolicy saraPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota300, 0, "Csara Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
-      ThirdPartyPolicy saraPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carNissan1000, 0, "Bsara Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
+      ThirdPartyPolicy saraPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota200, 0, "Saraa Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
+      ThirdPartyPolicy saraPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota500, 0, "Sarad Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
+      ThirdPartyPolicy saraPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota300, 0, "Sarac Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
+      ThirdPartyPolicy saraPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carNissan1000, 0, "Sarab Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
       userSara.addPolicy(userSara.getUserID(), userSara.getPassword(), saraPolicy1);
       userSara.addPolicy(userSara.getUserID(), userSara.getPassword(), saraPolicy2);
       userSara.addPolicy(userSara.getUserID(), userSara.getPassword(), saraPolicy3);
@@ -206,10 +214,10 @@ public class Program {
       car2Nissan1000.setPrice(100000);
       Car carFord2000 = new Car(carFord);
       carFord2000.setPrice(200000);
-      ThirdPartyPolicy johnPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carNissan500, 0, "Ajohn Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
-      ThirdPartyPolicy johnPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota100, 0, "Djohn Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
-      ThirdPartyPolicy johnPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car2Nissan1000, 0, "Cjohn Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
-      ThirdPartyPolicy johnPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFord2000, 0, "Bjohn Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
+      ThirdPartyPolicy johnPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carNissan500, 0, "Johna Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
+      ThirdPartyPolicy johnPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota100, 0, "Johnd Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
+      ThirdPartyPolicy johnPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car2Nissan1000, 0, "Johnc Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
+      ThirdPartyPolicy johnPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFord2000, 0, "Johnb Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
       userJohn.addPolicy(userJohn.getUserID(), userJohn.getPassword(), johnPolicy1);
       userJohn.addPolicy(userJohn.getUserID(), userJohn.getPassword(), johnPolicy2);
       userJohn.addPolicy(userJohn.getUserID(), userJohn.getPassword(), johnPolicy3);
@@ -224,10 +232,10 @@ public class Program {
       carToyota5000.setPrice(500000);
       Car carPorsche400 = new Car(carPorsche);
       carPorsche400.setPrice(40000);
-      ThirdPartyPolicy robertPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFord150, 0, "Arobert Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
-      ThirdPartyPolicy robertPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car3Nissan1000, 0, "Drobert Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
-      ThirdPartyPolicy robertPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota5000, 0, "Crobert Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
-      ThirdPartyPolicy robertPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carPorsche400, 0, "Brobert Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
+      ThirdPartyPolicy robertPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFord150, 0, "Roberta Policy", new MyDate(2025, 1, 19), "1 year full warranty.");
+      ThirdPartyPolicy robertPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car3Nissan1000, 0, "Robertd Policy", new MyDate(2026, 2, 20), "2 year full warranty.");
+      ThirdPartyPolicy robertPolicy3 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carToyota5000, 0, "Robertc Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
+      ThirdPartyPolicy robertPolicy4 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carPorsche400, 0, "Robertb Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
       userRobert.addPolicy(userRobert.getUserID(), userRobert.getPassword(), robertPolicy1);
       userRobert.addPolicy(userRobert.getUserID(), userRobert.getPassword(), robertPolicy2);
       userRobert.addPolicy(userRobert.getUserID(), userRobert.getPassword(), robertPolicy3);
@@ -238,8 +246,8 @@ public class Program {
       carFerrari500.setPrice(50000);
       Car car4Nissan1000 = new Car(carNissan);
       car4Nissan1000.setPrice(100000);
-      ThirdPartyPolicy alexPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFerrari500, 0, "Balex Policy", new MyDate(2027, 1, 21), "3 year full warranty.");
-      ThirdPartyPolicy alexPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car4Nissan1000, 0, "Aalex Policy", new MyDate(2028, 1, 22), "4 year full warranty.");
+      ThirdPartyPolicy alexPolicy1 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), carFerrari500, 0, "Alexb Policy", new MyDate(2020, 1, 21), "3 year full warranty.");
+      ThirdPartyPolicy alexPolicy2 = new ThirdPartyPolicy(InsurancePolicy.generateRandomId(), car4Nissan1000, 0, "Alexa Policy", new MyDate(2020, 1, 22), "4 year full warranty.");
       userAlex.addPolicy(userAlex.getUserID(), userAlex.getPassword(), alexPolicy1);
       userAlex.addPolicy(userAlex.getUserID(), userAlex.getPassword(), alexPolicy2);
 
@@ -255,6 +263,114 @@ public class Program {
     insuranceCompany.addUser(insuranceCompany.getAdminUsername(), insuranceCompany.getAdminPassword(), userRobert);
     insuranceCompany.addUser(insuranceCompany.getAdminUsername(), insuranceCompany.getAdminPassword(), userAlex);
 	}
+
+  public static void lambdaTestCode(InsuranceCompany insuranceCompany) {
+    int flatRate = insuranceCompany.getFlatRate();
+    ArrayList<InsurancePolicy> policies = (ArrayList<InsurancePolicy>) insuranceCompany
+      .allPolicies(insuranceCompany.getAdminUsername(), insuranceCompany.getAdminPassword())
+      .values().stream().collect(Collectors.toList());
+
+    ToDoubleFunction<InsurancePolicy> getPolicyPayment = policy -> policy.calcPayment(flatRate);
+    Predicate<InsurancePolicy> findJohnPolicy = policy -> policy.getPolicyHolderName().contains("John");
+    Predicate<InsurancePolicy> findPolicyInRange = policy -> policy.calcPayment(flatRate) > 200 && policy.calcPayment(flatRate) < 500;
+
+    // example
+    System.out.println("Policies with price above 10k, sorted by number of claims:");
+    policies.stream()
+      .filter(policy -> policy.getCar().getPrice() < 10000)
+      .sorted(Comparator.comparing(InsurancePolicy::getNumberOfClaims))
+      .forEach(System.out::println);
+    System.out.println();
+    System.out.println();
+    
+    // a)
+    System.out.println("Policies containing 'John' in their holder-name:");
+    policies.stream()
+      .filter(findJohnPolicy)
+      .forEach(System.out::println);
+    System.out.println();
+    System.out.println();
+
+    // b)
+    System.out.printf("Total Payment of Policies containing 'John' in their holder-name: \n$%s",
+      policies.stream()
+        .filter(findJohnPolicy)
+        .mapToDouble(getPolicyPayment)
+        .sum()
+    );
+    System.out.println();
+    System.out.println();
+
+    // c)
+    System.out.printf("First Policy in range between $200-$500: \n%s",
+      policies.stream()
+        .filter(findPolicyInRange)
+        .findFirst()
+        .map(policy -> String.format("%s %s $%s", policy.getPolicyHolderName(), policy.getId(), policy.calcPayment(flatRate)))
+        .get()
+    );
+    System.out.println();
+    System.out.println();
+
+    // d)
+    System.out.println("Policies in range between $200-$500 sorted:");
+    policies.stream()
+      .filter(findPolicyInRange)
+      .sorted(Comparator.comparingDouble(getPolicyPayment))
+      .forEach(policy -> System.out.printf("%s %s $%s\n", policy.getPolicyHolderName(), policy.getId(), policy.calcPayment(flatRate)));
+    System.out.println();
+
+    // e)
+    System.out.printf("Total Payment of range between $200-$500 sorted: \n$%s",
+      policies.stream()
+        .filter(findPolicyInRange)
+        .mapToDouble(getPolicyPayment)
+        .sum()
+    );
+    System.out.println();
+    System.out.println();
+
+    // f)
+    System.out.println("Policies with holder name 'Johna Policy':");
+    Predicate<InsurancePolicy> c1 = policy -> policy.getPolicyHolderName().equals("Johna Policy");
+    ArrayList<InsurancePolicy> policies1 = filterPolicies(policies, c1);
+    InsuranceCompany.printPolicies(policies1);
+    System.out.println("Policies with expiry date in 2020:");
+    InsuranceCompany.printPolicies(filterPolicies(policies, policy -> policy.getExpiryDate().getYear() == 2020));
+    System.out.println("Policies containing 'Toyota' car model:");
+    InsuranceCompany.printPolicies(filterPolicies(policies, policy -> policy.getCar().getModel().contains("Toyota")));
+    System.out.println();
+    System.out.println();
+
+    // g)
+    System.out.println("Policies with LUX car, sorted by car price:");
+    filterPolicies(policies, policy -> policy.getCar().getType().name().equals("LUX")).stream()
+      .sorted(Comparator.comparingDouble(policy -> policy.getCar().getPrice()))
+      .forEach(System.out::println);
+    System.out.println();
+    System.out.println();
+   
+    // h)
+    System.out.println("Policies with LUX car, sorted by car price:");
+    Map<Integer, List<InsurancePolicy>> aggregatedByExpiryDate = policies.stream()
+      .collect(Collectors.groupingBy(
+        policy -> policy.getExpiryDate().getYear(),
+        Collectors.toList()
+      ));
+    aggregatedByExpiryDate.forEach((year, groupedPolicies) -> {
+      System.out.println("---------------" + year + "----------------");
+      InsuranceCompany.printPolicies((ArrayList<InsurancePolicy>) groupedPolicies);
+    });
+    System.out.println("-----------------------------------");
+    System.out.println();
+    System.out.println();
+  }
+
+  public static ArrayList<InsurancePolicy> filterPolicies(ArrayList<InsurancePolicy> policies, Predicate<InsurancePolicy> criteria) {
+    return (ArrayList<InsurancePolicy>) policies.stream()
+      .filter(criteria)
+      .collect(Collectors.toList());
+  }
 
   // public static void addPolicyToCompany(InsuranceCompany company, int userID, InsurancePolicy policy) {
   //   if (company.addPolicy(userID, policy)) {
