@@ -26,7 +26,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   private HashMap<Integer, InsurancePolicy> policies;
   public final static String delimitedKey = "U";
 
-  private static Function<User, User> clonePolicySafely = user -> {
+  private static Function<User, User> cloneUserSafely = user -> {
     try {
       return user.clone();
     } catch (CloneNotSupportedException e) {
@@ -51,6 +51,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
 
   public User(User user) {
     this.name = user.name;
+    this.password = user.password;
     this.userID = idCounter;
     this.address = new Address(user.address);
     this.policies = new HashMap<Integer, InsurancePolicy>();
@@ -361,7 +362,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     // }
     // return deepCopy;
     return (ArrayList<User>) (users.stream()
-      .map(clonePolicySafely)
+      .map(cloneUserSafely)
       .collect(Collectors.toCollection(ArrayList::new)));
   }
 
@@ -372,7 +373,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     // }
     // return deepCopy;
     return (ArrayList<User>) (users.values().stream()
-      .map(clonePolicySafely)
+      .map(cloneUserSafely)
       .collect(Collectors.toCollection(ArrayList::new)));
   }
 
@@ -383,7 +384,7 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     // }
     // return deepCopy;
     return (HashMap<Integer, User>) (users.values().stream()
-      .collect(Collectors.toMap(user -> user.getUserID(), clonePolicySafely)));
+      .collect(Collectors.toMap(user -> user.getUserID(), cloneUserSafely)));
   }
   
   public ArrayList<InsurancePolicy> shallowCopyPolicies(int userID, String password) {
