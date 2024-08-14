@@ -222,37 +222,49 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   // Assignment 1
   public ArrayList<String> populateDistinctCarModels(int userID, String password) {
     if (!validateUser(userID, password)) return new ArrayList<>();
-    ArrayList<String> result = new ArrayList<>();
-    for (InsurancePolicy policy : policies.values()) {
-      String model = policy.getCar().getModel();
-      if (!result.contains(model)) {
-        result.add(model);
-      }
-    }
-    return result;
+    // ArrayList<String> result = new ArrayList<>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   String model = policy.getCar().getModel();
+    //   if (!result.contains(model)) {
+    //     result.add(model);
+    //   }
+    // }
+    // return result;
+    return (ArrayList<String>) (policies.values().stream()
+      .map(policy -> policy.getCar().getModel())
+      .distinct()
+      .collect(Collectors.toList()));
   }
   
   public int getTotalCountPerCarModel(int userID, String password, String carModel) {
-    int count = 0;
-    if (!validateUser(userID, password)) return count;
-    for (InsurancePolicy policy : policies.values()) {
-      if (policy.getCar().getModel().equals(carModel)) {
-        count++;
-      }
-    }
-    return count;
+    if (!validateUser(userID, password)) return 0;
+    // int count = 0;
+    // for (InsurancePolicy policy : policies.values()) {
+    //   if (policy.getCar().getModel().equals(carModel)) {
+    //     count++;
+    //   }
+    // }
+    // return count;
+    return (int) policies.values().stream()
+      .filter(policy -> policy.getCar().getModel().equals(carModel))
+      .count();
   }
   
   //lab5
   public HashMap<String, Integer> getTotalCountPerCarModel(int userID, String password) {
-    HashMap<String, Integer> counts = new HashMap<String, Integer>();
-    if (!validateUser(userID, password)) return counts;
-    for (InsurancePolicy policy : policies.values()) {
-      Integer count = counts.get(policy.getCar().getModel());
-      count = count == null ? 1 : count + 1;
-      counts.put(policy.getCar().getModel(), count);
-    }
-    return counts;
+    if (!validateUser(userID, password)) return new HashMap<>();
+    // HashMap<String, Integer> counts = new HashMap<String, Integer>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   Integer count = counts.get(policy.getCar().getModel());
+    //   count = count == null ? 1 : count + 1;
+    //   counts.put(policy.getCar().getModel(), count);
+    // }
+    // return counts;
+    return (HashMap<String, Integer>) (policies.values().stream()
+      .collect(Collectors.groupingBy(
+          policy -> policy.getCar().getModel(),
+          Collectors.summingInt(policy -> 1)
+      )));
   }
 
   public double getTotalPaymentForCarModel(int userID, String password, String carModel, int flatRate) {
@@ -263,33 +275,44 @@ public class User implements Cloneable, Comparable<User>, Serializable {
   
   //lab5
   public HashMap<String, Double> getTotalPaymentForCarModel(int userID, String password, int flatRate) {
-    HashMap<String, Double> totals = new HashMap<String, Double>();
-    if (!validateUser(userID, password)) return totals;
-    for (InsurancePolicy policy : policies.values()) {
-      Double total = totals.get(policy.getCar().getModel());
-      Double calculatedTotal = policy.calcPayment(flatRate);
-      total = total == null ? calculatedTotal : total + calculatedTotal;
-      totals.put(policy.getCar().getModel(), total);
-    }
-    return totals;
+    if (!validateUser(userID, password)) return new HashMap<>();
+    // HashMap<String, Double> totals = new HashMap<String, Double>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   Double total = totals.get(policy.getCar().getModel());
+    //   Double calculatedTotal = policy.calcPayment(flatRate);
+    //   total = total == null ? calculatedTotal : total + calculatedTotal;
+    //   totals.put(policy.getCar().getModel(), total);
+    // }
+    // return totals;
+    return (HashMap<String, Double>) policies.values().stream()
+      .collect(Collectors.groupingBy(
+        policy -> policy.getCar().getModel(),
+        Collectors.summingDouble(policy -> policy.calcPayment(flatRate))
+      ));
   }
 
   public ArrayList<Integer> getTotalCountPerCarModel(int userID, String password, ArrayList<String> carModels) {
-    ArrayList<Integer> carModelCounts = new ArrayList<>();
-    if (!validateUser(userID, password)) return carModelCounts;
-    for (String carModel : populateDistinctCarModels(userID, password)) {
-      carModelCounts.add(getTotalCountPerCarModel(userID, password, carModel));
-    }
-    return carModelCounts;
+    if (!validateUser(userID, password)) return new ArrayList<>();
+    // ArrayList<Integer> carModelCounts = new ArrayList<>();
+    // for (String carModel : populateDistinctCarModels(userID, password)) {
+    //   carModelCounts.add(getTotalCountPerCarModel(userID, password, carModel));
+    // }
+    // return carModelCounts;
+    return (ArrayList<Integer>) populateDistinctCarModels(userID, password).stream()
+      .map(carModel -> getTotalCountPerCarModel(userID, password, carModel))
+      .collect(Collectors.toList());
   }
 
   public ArrayList<Double> getTotalPaymentPerCarModel(int userID, String password, ArrayList<String> carModels, int flatRate) {
-    ArrayList<Double> totalPaymentPerCars = new ArrayList<>();
-    if (!validateUser(userID, password)) return totalPaymentPerCars;
-    for (String carModel : populateDistinctCarModels(userID, password)) {
-      totalPaymentPerCars.add(getTotalPaymentForCarModel(userID, password, carModel, flatRate));
-    }
-    return totalPaymentPerCars;
+    if (!validateUser(userID, password)) return new ArrayList<>();
+    // ArrayList<Double> totalPaymentPerCars = new ArrayList<>();
+    // for (String carModel : populateDistinctCarModels(userID, password)) {
+    //   totalPaymentPerCars.add(getTotalPaymentForCarModel(userID, password, carModel, flatRate));
+    // }
+    // return totalPaymentPerCars;
+    return (ArrayList<Double>) populateDistinctCarModels(userID, password).stream()
+      .map(carModel -> getTotalPaymentForCarModel(userID, password, carModel, flatRate))
+      .collect(Collectors.toList());
   }
 
   public static void reportPaymentsPerCarModel(ArrayList<String> carModels, ArrayList<Integer>counts, ArrayList<Double> premiumPayments) {

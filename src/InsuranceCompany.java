@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 //lab3
@@ -285,45 +286,59 @@ public class InsuranceCompany implements Cloneable, Serializable {
   // }
 
   public HashMap<Integer, InsurancePolicy> filterByExpiryDate(String adminUsername, String adminPassword, MyDate date) {
-    HashMap<Integer, InsurancePolicy> result = new HashMap<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return result;
-    for (User user : users.values()) {
-      result.putAll(user.filterByExpiryDate(user.getUserID(), user.getPassword(), date));
-    }
-    return result;
+    if (!validateAdmin(adminUsername, adminPassword)) return new HashMap<>();
+    // HashMap<Integer, InsurancePolicy> result = new HashMap<>();
+    // for (User user : users.values()) {
+    //   result.putAll(user.filterByExpiryDate(user.getUserID(), user.getPassword(), date));
+    // }
+    // return result;
+    return (HashMap<Integer, InsurancePolicy>) (users.values().stream()
+      .flatMap(user -> user.filterByExpiryDate(user.getUserID(), user.getPassword(), date).values().stream())
+      .collect(Collectors.toMap(InsurancePolicy::getId, policy -> policy)));
   }
 
   // Assignment 1
   public ArrayList<String> populateDistinctCityNames(String adminUsername, String adminPassword) {
-    ArrayList<String> result = new ArrayList<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return result;
-    for (User user : users.values()) {
-      Address address = user.getAddress();
-      if (!result.contains(address.getCity())) {
-        result.add(address.getCity());
-      }
-    }
-    return result;
+    if (!validateAdmin(adminUsername, adminPassword)) return new ArrayList<>();
+    // ArrayList<String> result = new ArrayList<>();
+    // for (User user : users.values()) {
+    //   Address address = user.getAddress();
+    //   if (!result.contains(address.getCity())) {
+    //     result.add(address.getCity());
+    //   }
+    // }
+    // return result;
+    return (ArrayList<String>) (users.values().stream()
+      .map(user -> user.getAddress().getCity())
+      .distinct()
+      .collect(Collectors.toList()));
   }
 
   public double getTotalPaymentForCity(String adminUsername, String adminPassword, String city) {
-    double result = 0;
-    if (!validateAdmin(adminUsername, adminPassword)) return result;
-    for (User user : users.values()) {
-      if (user.getAddress().getCity().equals(city)) {
-        result += user.calcTotalPayments(user.getUserID(), user.getPassword(), flatRate);
-      }
-    }
-    return result;
+    if (!validateAdmin(adminUsername, adminPassword)) return 0;
+    // double result = 0;
+    // for (User user : users.values()) {
+    //   if (user.getAddress().getCity().equals(city)) {
+    //     result += user.calcTotalPayments(user.getUserID(), user.getPassword(), flatRate);
+    //   }
+    // }
+    // return result;
+    return users.values().stream()
+      .filter(user -> user.getAddress().getCity().equals(city))
+      .mapToDouble(user -> user.calcTotalPayments(user.getUserID(), user.getPassword(), flatRate))
+      .sum();
   }
 
   public ArrayList<Double> getTotalPaymentPerCity(String adminUsername, String adminPassword, ArrayList<String> cities) {
-    ArrayList<Double> result = new ArrayList<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return result;
-    for (String city : cities) {
-      result.add(getTotalPaymentForCity(adminUsername, adminPassword, city));
-    }
-    return result;
+    if (!validateAdmin(adminUsername, adminPassword)) return new ArrayList<>();
+    // ArrayList<Double> result = new ArrayList<>();
+    // for (String city : cities) {
+    //   result.add(getTotalPaymentForCity(adminUsername, adminPassword, city));
+    // }
+    // return result;
+    return (ArrayList<Double>) (cities.stream()
+      .map(city -> getTotalPaymentForCity(adminUsername, adminPassword, city))
+      .collect(Collectors.toList()));
   }
 
   public static void reportPaymentPerCity(ArrayList<String> cities, ArrayList<Double> payments) {
@@ -345,42 +360,56 @@ public class InsuranceCompany implements Cloneable, Serializable {
   }
 
   public ArrayList<String> populateDistinctCarModels(String adminUsername, String adminPassword) {
-    ArrayList<String> carModels = new ArrayList<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return carModels;
-    for (User user : users.values()) {
-      for (String carModel : user.populateDistinctCarModels(user.getUserID(), user.getPassword())) {
-        if (!carModel.contains(carModel)) {
-          carModels.add(carModel);
-        }
-      }
-    }
-    return carModels;
+    if (!validateAdmin(adminUsername, adminPassword)) return new ArrayList<>();
+    // ArrayList<String> carModels = new ArrayList<>();
+    // for (User user : users.values()) {
+    //   for (String carModel : user.populateDistinctCarModels(user.getUserID(), user.getPassword())) {
+    //     if (!carModel.contains(carModel)) {
+    //       carModels.add(carModel);
+    //     }
+    //   }
+    // }
+    // return carModels;
+    return (ArrayList<String>) (users.values().stream()
+      .flatMap(user -> user.populateDistinctCarModels(user.getUserID(), user.getPassword()).stream())
+      .distinct()
+      .collect(Collectors.toList()));
   }
 
   public ArrayList<Integer> getTotalCountPerCarModel(String adminUsername, String adminPassword, ArrayList<String> carModels) {
-    ArrayList<Integer> carModelCounts = new ArrayList<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return carModelCounts;
-    for (String carModel : populateDistinctCarModels(adminUsername, adminPassword)) {
-      int carModelCount = 0;
-      for (User user : users.values()) {
-        carModelCount += user.getTotalCountPerCarModel(user.getUserID(), user.getPassword(), carModel);
-      }
-      carModelCounts.add(carModelCount);
-    }
-    return carModelCounts;
+    if (!validateAdmin(adminUsername, adminPassword)) return new ArrayList<>();
+    // ArrayList<Integer> carModelCounts = new ArrayList<>();
+    // for (String carModel : populateDistinctCarModels(adminUsername, adminPassword)) {
+    //   int carModelCount = 0;
+    //   for (User user : users.values()) {
+    //     carModelCount += user.getTotalCountPerCarModel(user.getUserID(), user.getPassword(), carModel);
+    //   }
+    //   carModelCounts.add(carModelCount);
+    // }
+    // return carModelCounts;
+    return (ArrayList<Integer>) populateDistinctCarModels(adminUsername, adminPassword).stream()
+      .map(carModel -> users.values().stream()
+        .mapToInt(user -> user.getTotalCountPerCarModel(user.getUserID(), user.getPassword(), carModel))
+        .sum()
+      ).collect(Collectors.toList());
   }
 
   public ArrayList<Double> getTotalPaymentPerCarModel(String adminUsername, String adminPassword, ArrayList<String> carModels) {
-    ArrayList<Double> totalPaymentPerCars = new ArrayList<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return totalPaymentPerCars;
-    for (String carModel : populateDistinctCarModels(adminUsername, adminPassword)) {
-      double carModelTotalPayment = 0;
-      for (User user : users.values()) {
-        carModelTotalPayment += user.getTotalPaymentForCarModel(user.getUserID(), user.getPassword(), carModel, flatRate);
-      }
-      totalPaymentPerCars.add(carModelTotalPayment);
-    }
-    return totalPaymentPerCars;
+    if (!validateAdmin(adminUsername, adminPassword)) return new ArrayList<>();
+    // ArrayList<Double> totalPaymentPerCars = new ArrayList<>();
+    // for (String carModel : populateDistinctCarModels(adminUsername, adminPassword)) {
+    //   double carModelTotalPayment = 0;
+    //   for (User user : users.values()) {
+    //     carModelTotalPayment += user.getTotalPaymentForCarModel(user.getUserID(), user.getPassword(), carModel, flatRate);
+    //   }
+    //   totalPaymentPerCars.add(carModelTotalPayment);
+    // }
+    // return totalPaymentPerCars;
+    return (ArrayList<Double>) populateDistinctCarModels(adminUsername, adminPassword).stream()
+      .map(carModel -> users.values().stream()
+        .mapToDouble(user -> user.getTotalPaymentForCarModel(user.getUserID(), user.getPassword(), carModel, flatRate))
+        .sum()
+      ).collect(Collectors.toList());
   }
 
   public static void reportPaymentsPerCarModel(ArrayList<String> carModels, ArrayList<Integer>counts, ArrayList<Double> premiumPayments) {
@@ -409,33 +438,46 @@ public class InsuranceCompany implements Cloneable, Serializable {
   }
   
   public HashMap<String, Integer> getTotalCountPerCarModel(String adminUsername, String adminPassword) {
-    HashMap<String, Integer> counts = new HashMap<String, Integer>();
-    if (!validateAdmin(adminUsername, adminPassword)) return counts;
-    for (User user : users.values()) {
-      HashMap<String, Integer> userCarModelCounts = user.getTotalCountPerCarModel(user.getUserID(), user.getPassword());
-      for (String carModel : userCarModelCounts.keySet()) {
-        Integer count = counts.get(carModel);
-        Integer counted = userCarModelCounts.get(carModel);
-        count = count == null ? counted : count + counted;
-        counts.put(carModel, count);
-      }
-    }
-    return counts;
+    if (!validateAdmin(adminUsername, adminPassword)) return new HashMap<>();
+    // HashMap<String, Integer> counts = new HashMap<String, Integer>();
+    // for (User user : users.values()) {
+    //   HashMap<String, Integer> userCarModelCounts = user.getTotalCountPerCarModel(user.getUserID(), user.getPassword());
+    //   for (String carModel : userCarModelCounts.keySet()) {
+    //     Integer count = counts.get(carModel);
+    //     Integer counted = userCarModelCounts.get(carModel);
+    //     count = count == null ? counted : count + counted;
+    //     counts.put(carModel, count);
+    //   }
+    // }
+    // return counts;
+    return (HashMap<String, Integer>) (users.values().stream()
+      .flatMap(user -> user.getTotalCountPerCarModel(user.getUserID(), user.getPassword()).entrySet().stream())
+      .collect(Collectors.groupingBy(
+          Map.Entry::getKey,
+          Collectors.summingInt(Map.Entry::getValue)
+      )));
   }
   
   public HashMap<String, Double> getTotalPremiumPerCarModel(String adminUsername, String adminPassword) {
-    HashMap<String, Double> totals = new HashMap<String, Double>();
-    if (!validateAdmin(adminUsername, adminPassword)) return totals;
-    for (User user : users.values()) {
-      HashMap<String, Double> userCarModelTotals = user.getTotalPaymentForCarModel(user.getUserID(), user.getPassword(), flatRate);
-      for (String carModel : userCarModelTotals.keySet()) {
-        Double total = totals.get(user.getAddress().getCity());
-        Double calculatedTotal = userCarModelTotals.get(carModel);
-        total = total == null ? calculatedTotal : total + calculatedTotal;
-        totals.put(carModel, total);
-      }
-    }
-    return totals;
+    if (!validateAdmin(adminUsername, adminPassword)) return new HashMap<>();
+    // HashMap<String, Double> totals = new HashMap<String, Double>();
+    // for (User user : users.values()) {
+    //   HashMap<String, Double> userCarModelTotals = user.getTotalPaymentForCarModel(user.getUserID(), user.getPassword(), flatRate);
+    //   for (String carModel : userCarModelTotals.keySet()) {
+    //     Double total = totals.get(user.getAddress().getCity());
+    //     Double calculatedTotal = userCarModelTotals.get(carModel);
+    //     total = total == null ? calculatedTotal : total + calculatedTotal;
+    //     totals.put(carModel, total);
+    //   }
+    // }
+    // return totals;
+    return (HashMap<String, Double>) (users.values().stream()
+      .flatMap(user -> user.getTotalPaymentForCarModel(user.getUserID(), user.getPassword(), flatRate).entrySet().stream())
+      .collect(Collectors.groupingBy(
+          Map.Entry::getKey,
+          HashMap::new,
+          Collectors.summingDouble(Map.Entry::getValue)
+      )));
   }
 
   public static void reportPaymentsPerCity(HashMap<String, Double> premiumPaymentsMap) {
@@ -450,16 +492,21 @@ public class InsuranceCompany implements Cloneable, Serializable {
 
   // ASM2
   public HashMap<String, ArrayList<User>> getUsersPerCity(String adminUsername, String adminPassword) {
-    HashMap<String, ArrayList<User>> userCityHashMap = new HashMap<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return userCityHashMap;
-    for (User user : users.values()) {
-      String city = user.getAddress().getCity();
-      ArrayList<User> foundUsers = userCityHashMap.get(city);
-      if (foundUsers == null) foundUsers = new ArrayList<>();
-      foundUsers.add(user);
-      userCityHashMap.put(city, foundUsers);
-    }
-    return userCityHashMap;
+    if (!validateAdmin(adminUsername, adminPassword)) return new HashMap<>();
+    // HashMap<String, ArrayList<User>> userCityHashMap = new HashMap<>();
+    // for (User user : users.values()) {
+    //   String city = user.getAddress().getCity();
+    //   ArrayList<User> foundUsers = userCityHashMap.get(city);
+    //   if (foundUsers == null) foundUsers = new ArrayList<>();
+    //   foundUsers.add(user);
+    //   userCityHashMap.put(city, foundUsers);
+    // }
+    // return userCityHashMap;
+    return (HashMap<String, ArrayList<User>>) (users.values().stream()
+      .collect(Collectors.groupingBy(
+          user -> user.getAddress().getCity(),
+          Collectors.collectingAndThen(Collectors.toList(), ArrayList::new)
+      )));
   }
   
   public static void reportUsersPerCity(HashMap<String, ArrayList<User>> cityUsersMap, int flatRate) {
@@ -481,13 +528,21 @@ public class InsuranceCompany implements Cloneable, Serializable {
   }
 
   public HashMap<String, ArrayList<InsurancePolicy>> filterPoliciesByExpiryDate(String adminUsername, String adminPassword, MyDate expiryDate) {
-    HashMap<String, ArrayList<InsurancePolicy>> userCityHashMap = new HashMap<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return userCityHashMap;
-    for (User user : users.values()) {
-      ArrayList<InsurancePolicy> expiredPolicies = new ArrayList<>(user.filterByExpiryDate(user.getUserID(), user.getPassword(), expiryDate).values());
-      userCityHashMap.put(user.getName(), expiredPolicies);
-    }
-    return userCityHashMap;
+    if (!validateAdmin(adminUsername, adminPassword)) return new HashMap<>();
+    // HashMap<String, ArrayList<InsurancePolicy>> userCityHashMap = new HashMap<>();
+    // for (User user : users.values()) {
+    //   ArrayList<InsurancePolicy> expiredPolicies = new ArrayList<>(user.filterByExpiryDate(user.getUserID(), user.getPassword(), expiryDate).values());
+    //   userCityHashMap.put(user.getName(), expiredPolicies);
+    // }
+    // return userCityHashMap;
+    return (HashMap<String, ArrayList<InsurancePolicy>>) (users.values().stream()
+    .collect(Collectors.groupingBy(
+        user -> user.getName(),
+        Collectors.flatMapping(
+          user -> user.filterByExpiryDate(user.getUserID(), user.getPassword(), expiryDate).values().stream(),
+          Collectors.collectingAndThen(Collectors.toList(), ArrayList::new)
+        )
+    )));
   }
   
   public static void reportPoliciesPerUser(HashMap<String, ArrayList<InsurancePolicy>> userPoliciesMap, int flatRate) {
