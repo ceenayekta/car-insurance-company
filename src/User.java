@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class User implements Cloneable, Comparable<User>, Serializable {
   public static int idCounter = 0;
@@ -460,30 +461,46 @@ public class User implements Cloneable, Comparable<User>, Serializable {
     int[] count = new int[ranges.length];
     Arrays.fill(count, 0);
     if (!validateUser(userID, password)) return count;
-    for (InsurancePolicy policy : policies.values()) {
-      double payment = policy.calcPayment(flatRate);
-      int index = getPaymentRangeIndex(payment, ranges);
-      count[index] += 1;
-    }
-    return count;
+
+    // for (InsurancePolicy policy : policies.values()) {
+    //   double payment = policy.calcPayment(flatRate);
+    //   int index = getPaymentRangeIndex(payment, ranges);
+    //   count[index] += 1;
+    // }
+    policies.values().stream()
+      .map(policy -> getPaymentRangeIndex(policy.calcPayment(flatRate), ranges))
+      .forEach(index -> count[index] += 1);
+
+    return  count;
+    
   }
 
   public HashMap<String, Integer[]> policyCarModelCount(int userID, String password, int[] ranges, double flatRate) {
-    HashMap<String, Integer[]> count = new HashMap<>();
-    if (!validateUser(userID, password)) return count;
-    for (InsurancePolicy policy : policies.values()) {
-      String carModel = policy.getCar().getModel();
-      Integer[] currentCount = count.get(carModel);
-      if (currentCount == null) {
-        currentCount = new Integer[ranges.length];
-        Arrays.fill(currentCount, 0);
-      }
-      double payment = policy.calcPayment(flatRate);
-      int index = getPaymentRangeIndex(payment, ranges);
-      currentCount[index] += 1;
-      count.put(carModel, currentCount);
-    }
-    return count;
+    if (!validateUser(userID, password)) return new HashMap<>();
+    // HashMap<String, Integer[]> count = new HashMap<>();
+    // for (InsurancePolicy policy : policies.values()) {
+    //   String carModel = policy.getCar().getModel();
+    //   Integer[] currentCount = count.get(carModel);
+    //   if (currentCount == null) {
+    //     currentCount = new Integer[ranges.length];
+    //     Arrays.fill(currentCount, 0);
+    //   }
+    //   double payment = policy.calcPayment(flatRate);
+    //   int index = getPaymentRangeIndex(payment, ranges);
+    //   currentCount[index] += 1;
+    //   count.put(carModel, currentCount);
+    // }
+    // return count;
+
+    return (HashMap<String, Integer[]>) policies.values().stream()
+      .collect(Collectors.toMap(
+        policy -> policy.getCar().getModel(),
+        policy -> IntStream.range(0, ranges.length).map(i -> i == getPaymentRangeIndex(policy.calcPayment(flatRate), ranges) ? 1 : 0).boxed().toArray(Integer[]::new),
+        (existing, newArray) -> {
+          Arrays.setAll(existing, i -> existing[i] + newArray[i]);
+          return existing;
+        }
+      ));
   }
 
   //lab6

@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 //lab3
 public class InsuranceCompany implements Cloneable, Serializable {
@@ -640,91 +641,135 @@ public class InsuranceCompany implements Cloneable, Serializable {
     int[] count = new int[ranges.length];
     Arrays.fill(count, 0);
     if (!validateAdmin(adminUsername, adminPassword)) return count;
-    for (User user : users.values()) {
-      int[] userPolicyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate);
-      for (int j = 0; j < userPolicyCount.length; j++) {
-        count[j] += userPolicyCount[j];
-      }
-    }
-    return count;
+    // for (User user : users.values()) {
+    //   int[] userPolicyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+    //   for (int j = 0; j < userPolicyCount.length; j++) {
+    //     count[j] += userPolicyCount[j];
+    //   }
+    // }
+    // return count;
+    return users.values().stream()
+      .map(user -> user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate))
+      .reduce(count, (resultCount, policyCount) -> {
+        Arrays.setAll(resultCount, i -> resultCount[i] + policyCount[i]);
+        return resultCount;
+      });
   }
 
   public HashMap<String, Integer[]> policyCityCount(String adminUsername, String adminPassword, int[] ranges) {
     HashMap<String, Integer[]> count = new HashMap<>();
     if (!validateAdmin(adminUsername, adminPassword)) return count;
-    for (User user : users.values()) {
-      String city = user.getAddress().getCity();
-      Integer[] currentCount = count.get(city);
-      int[] userPolicyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate);
-      if (currentCount == null) {
-        currentCount = new Integer[ranges.length];
-        Arrays.fill(currentCount, 0);
-      }
-      for (int j = 0; j < userPolicyCount.length; j++) {
-        currentCount[j] += userPolicyCount[j];
-      }
-      count.put(city, currentCount);
-    }
-    return count;
+    // for (User user : users.values()) {
+    //   String city = user.getAddress().getCity();
+    //   Integer[] currentCount = count.get(city);
+    //   int[] userPolicyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+    //   if (currentCount == null) {
+    //     currentCount = new Integer[ranges.length];
+    //     Arrays.fill(currentCount, 0);
+    //   }
+    //   for (int j = 0; j < userPolicyCount.length; j++) {
+    //     currentCount[j] += userPolicyCount[j];
+    //   }
+    //   count.put(city, currentCount);
+    // }
+    // return count;
+    return (HashMap<String, Integer[]>) users.values().stream()
+      .collect(Collectors.toMap(
+        user -> user.getAddress().getCity(),
+        user -> IntStream.of(user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate)).boxed().toArray(Integer[]::new),
+        (existing, newArray) -> {
+          Arrays.setAll(existing, i -> existing[i] + newArray[i]);
+          return existing;
+        }
+      ));
   }
 
   public int[] userCount(String adminUsername, String adminPassword, int[] ranges) {
     int[] count = new int[ranges.length];
     Arrays.fill(count, 0);
     if (!validateAdmin(adminUsername, adminPassword)) return count;
-    for (User user : users.values()) {
-      int[] userPolicyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate);
-      for (int j = 0; j < userPolicyCount.length; j++) {
-        if (userPolicyCount[j] > 0) {
-          count[j] += 1;
-        }
-      }
-    }
-    return count;
+    // for (User user : users.values()) {
+    //   int[] userPolicyCount = user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+    //   for (int j = 0; j < userPolicyCount.length; j++) {
+    //     if (userPolicyCount[j] > 0) {
+    //       count[j] += 1;
+    //     }
+    //   }
+    // }
+    // return count;
+    return users.values().stream()
+      .map(user -> user.policyCount(user.getUserID(), user.getPassword(), ranges, flatRate))
+      .reduce(count, (resultCount, policyCount) -> {
+        Arrays.setAll(resultCount, i -> policyCount[i] > 0 ? resultCount[i] + 1 : resultCount[i]);
+        return resultCount;
+      });
   }
 
   public HashMap<String, Integer[]> userCarModelCount(String adminUsername, String adminPassword, int[] ranges) {
-    HashMap<String, Integer[]> count = new HashMap<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return count;
-    for (User user : users.values()) {
-      HashMap<String, Integer[]> userPolicyCarModelCount = user.policyCarModelCount(user.getUserID(), user.getPassword(), ranges, flatRate);
-      for (String carModel : userPolicyCarModelCount.keySet()) {
-        Integer[] currentCount = count.get(carModel);
-        Integer[] carModelCount = userPolicyCarModelCount.get(carModel);
-        if (currentCount == null) {
-          currentCount = new Integer[ranges.length];
-          Arrays.fill(currentCount, 0);
-        }
-        for (int j = 0; j < carModelCount.length; j++) {
-          if (carModelCount[j] > 0) {
-            currentCount[j] += 1;
-          }
-        }
-        count.put(carModel, currentCount);
-      }
-    }
-    return count;
+    if (!validateAdmin(adminUsername, adminPassword)) return new HashMap<>();
+    // HashMap<String, Integer[]> count = new HashMap<>();
+    // for (User user : users.values()) {
+    //   HashMap<String, Integer[]> userPolicyCarModelCount = user.policyCarModelCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+    //   for (String carModel : userPolicyCarModelCount.keySet()) {
+    //     Integer[] currentCount = count.get(carModel);
+    //     Integer[] carModelCount = userPolicyCarModelCount.get(carModel);
+    //     if (currentCount == null) {
+    //       currentCount = new Integer[ranges.length];
+    //       Arrays.fill(currentCount, 0);
+    //     }
+    //     for (int j = 0; j < carModelCount.length; j++) {
+    //       if (carModelCount[j] > 0) {
+    //         currentCount[j] += 1;
+    //       }
+    //     }
+    //     count.put(carModel, currentCount);
+    //   }
+    // }
+    // return count;
+    return (HashMap<String,Integer[]>) users.values().stream()
+      .flatMap(user -> user.policyCarModelCount(user.getUserID(), user.getPassword(), ranges, flatRate).entrySet().stream())
+      .collect(Collectors.toMap(
+        Map.Entry::getKey,
+        // Map.Entry::getValue,
+        entry -> Arrays.stream(entry.getValue()).map(v -> v > 0 ? 1 : 0).toArray(Integer[]::new),
+        (existing, newCount) -> {
+          Arrays.setAll(existing, i -> existing[i] + newCount[i]);
+          return existing;
+        },
+        () -> new HashMap<>()
+      ));
   }
 
   public HashMap<String, Integer[]> policyCarModelCount(String adminUsername, String adminPassword, int[] ranges) {
-    HashMap<String, Integer[]> count = new HashMap<>();
-    if (!validateAdmin(adminUsername, adminPassword)) return count;
-    for (User user : users.values()) {
-      HashMap<String, Integer[]> userPolicyCarModelCount = user.policyCarModelCount(user.getUserID(), user.getPassword(), ranges, flatRate);
-      for (String carModel : userPolicyCarModelCount.keySet()) {
-        Integer[] currentCount = count.get(carModel);
-        Integer[] carModelCount = userPolicyCarModelCount.get(carModel);
-        if (currentCount == null) {
-          currentCount = new Integer[ranges.length];
-          Arrays.fill(currentCount, 0);
+    if (!validateAdmin(adminUsername, adminPassword)) return new HashMap<>();
+    // HashMap<String, Integer[]> count = new HashMap<>();
+    // for (User user : users.values()) {
+    //   HashMap<String, Integer[]> userPolicyCarModelCount = user.policyCarModelCount(user.getUserID(), user.getPassword(), ranges, flatRate);
+    //   for (String carModel : userPolicyCarModelCount.keySet()) {
+    //     Integer[] currentCount = count.get(carModel);
+    //     Integer[] carModelCount = userPolicyCarModelCount.get(carModel);
+    //     if (currentCount == null) {
+    //       currentCount = new Integer[ranges.length];
+    //       Arrays.fill(currentCount, 0);
+    //     }
+    //     for (int j = 0; j < carModelCount.length; j++) {
+    //       currentCount[j] += carModelCount[j];
+    //     }
+    //     count.put(carModel, currentCount);
+    //   }
+    // }
+    // return count;
+    
+    return (HashMap<String, Integer[]>) users.values().stream()
+      .flatMap(user -> user.policyCarModelCount(user.getUserID(), user.getPassword(), ranges, flatRate).entrySet().stream())
+      .collect(Collectors.toMap(
+        Map.Entry::getKey,
+        Map.Entry::getValue,
+        (existing, newArray) -> {
+          Arrays.setAll(existing, i -> existing[i] + newArray[i]);
+          return existing;
         }
-        for (int j = 0; j < carModelCount.length; j++) {
-          currentCount[j] += carModelCount[j];
-        }
-        count.put(carModel, currentCount);
-      }
-    }
-    return count;
+      ));
   }
 
   //lab6
