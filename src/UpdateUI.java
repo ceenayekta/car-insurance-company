@@ -21,6 +21,7 @@ public class UpdateUI extends javax.swing.JFrame {
         this.policy = policy;
         this.userUI = userUI;
         initComponents();
+        setTitle("Update " + policy.getPolicyHolderName()+ " (Policy UI)");
     }
 
     /**

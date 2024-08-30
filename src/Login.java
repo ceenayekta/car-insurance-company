@@ -25,6 +25,7 @@ public class Login extends javax.swing.JFrame {
     public Login(InsuranceCompany company) {
         this.company = company;
         initComponents();
+        setTitle("Login UI");
     }
 
     /**
@@ -68,10 +69,8 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
-        usernameField.setText("1");
         usernameField.setToolTipText("Username");
 
-        passwordField.setText("foo1234");
         passwordField.setToolTipText("Password");
         passwordField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -159,14 +158,18 @@ public class Login extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         try {
-            int username = Integer.parseInt(usernameField.getText());
-            User user = company.validateUser(username, passwordField.getText());
-            if (user == null) throw new Exception();
-            ArrayList<String> cities = company.populateDistinctCityNames(company.getAdminUsername(), company.getAdminPassword());
-            new UserUI(user, cities, company.getFlatRate(), this).setVisible(true);
+            if (company.validateAdmin(usernameField.getText(), passwordField.getText())) {
+                new AdminUI(company, this).setVisible(true);
+            } else {
+                User user = company.validateUser(Integer.parseInt(usernameField.getText()), passwordField.getText());
+                if (user == null) throw new Exception();
+                ArrayList<String> cities = company.populateDistinctCityNames(company.getAdminUsername(), company.getAdminPassword());
+                new UserUI(user, cities, company.getFlatRate(), this).setVisible(true);
+            }
             setVisible(false);
             passwordField.setText("");
         } catch (Exception e) {
+            System.out.println(e);
             usernameField.setText("");
             passwordField.setText("");
             JOptionPane.showMessageDialog(rootPane, "Username or Password incorrect.", "Login Failed", JOptionPane.ERROR_MESSAGE);

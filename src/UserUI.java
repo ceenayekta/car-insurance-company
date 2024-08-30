@@ -33,6 +33,8 @@ public class UserUI extends javax.swing.JFrame {
         this.flatRate = flatRate;
         this.login = login;
         initComponents();
+        if (login == null) jMenu1.setText("Exit");
+        setTitle(user.getName() + " (User UI)");
     }
 
     /**
@@ -755,7 +757,7 @@ public class UserUI extends javax.swing.JFrame {
     private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
         if (JOptionPane.showConfirmDialog(rootPane, "Are you sure?", "Logout", JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
             dispose();
-            login.setVisible(true);
+            if (login != null) login.setVisible(true);
         }
     }//GEN-LAST:event_jMenu1MouseClicked
 
