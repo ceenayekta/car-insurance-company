@@ -56,6 +56,5 @@ For an easier track what's done, please view [Github Repository](https://github.
 - Advanced Level
 
 ## Assignment 3 Completed Levels:
-For an easier track what's done, please view [Github Repository](https://github.com/ceenayekta/car-insurance-company), and view any branch you wish.
 - Core Level
 - Standard Level
