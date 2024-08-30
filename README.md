@@ -4,7 +4,7 @@ A simple Insurance Company Java Template for easier insurance management!
 
 ## Classes Structure
 All classes are located in ./src.
-The directory `SearchStructureComparison` contains the time duration of each search structure process.
+The directories `SearchStructureComparison`, `NodesAndRecursive` and `Problems` are irrelevant to this project. Those are side activities done.
 
 You can find classes' relations below:
 - `InsuranceCompany`: Each company have multiple `Users` 
@@ -42,7 +42,7 @@ UI Classes:
 To contribute, you can clone all classes except `UserInterface` and `Program` add your own UI and program. 
 
 ## Purpose
-This project is written for college assignment.
+This project is written for an assignment.
 For an easier track what's done, please view [Github Repository](https://github.com/ceenayekta/car-insurance-company), and view any branch you wish.
 
 ## Assignment 1 Completed Levels:
