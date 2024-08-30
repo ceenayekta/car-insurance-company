@@ -1,5 +1,5 @@
 
-package SearchStructuresComparision;
+package SearchStructuresComparison;
 
 /**
  *
